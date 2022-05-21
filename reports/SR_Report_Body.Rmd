@@ -1,0 +1,122 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+require("knitr")
+opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
+```
+
+
+
+
+```{r pander_tweaks, include=FALSE}
+
+library(datapasta) # Ctrl + Shift + t OR Ctrl + Alt + Shift + v for vector
+library(groundhog)
+groundhog.library("tidyverse", "2021-09-30")
+groundhog.library("haven", "2021-09-30")
+groundhog.library("forcats", "2021-09-30")
+groundhog.library("lubridate", "2021-09-30")
+groundhog.library("RColorBrewer", "2021-09-30")
+groundhog.library("gcookbook", "2021-09-30")
+groundhog.library("purrr", "2021-09-30")
+groundhog.library("viridis", "2021-09-30")
+groundhog.library("captioner", "2021-09-30")
+groundhog.library("dplyr", "2021-09-30")
+groundhog.library("broom", "2021-09-30") # tidy statistical outputs
+groundhog.library("qqplotr", "2021-09-30")
+groundhog.library("stringr", "2021-09-30") # helping wrap title text
+groundhog.library("ggpubr", "2021-09-30") # making it easier to arrange graphs, eg for q3
+# groundhog.library("gt", "2021-09-30") unsure if needed - for certain table philosophy...
+groundhog.library("questionr", "2021-09-30")
+groundhog.library("janitor", "2021-09-30")
+groundhog.library("reshape2", "2021-09-30")
+groundhog.library("arsenal", "2021-09-30")
+groundhog.library("bookdown", "2021-09-30")
+groundhog.library("knitr", "2021-09-30")
+groundhog.library("flextable", "2021-09-30")
+groundhog.library("officer", "2021-09-30")
+groundhog.library("captioner", "2021-09-30")
+groundhog.library("pander", "2021-09-30")
+groundhog.library("papaja", "2021-09-30") #  Prepare APA journal articles with R Markdown
+groundhog.library("rstatix", "2021-09-30")
+groundhog.library("pwr", "2021-09-30")# for power analysis
+groundhog.library("ccoptimalmatch", "2021-09-30")
+groundhog.library("glue", "2021-09-30")
+groundhog.library("psych", "2021-09-30") # for PCA
+groundhog.library("plotrix", "2021-09-30") # for standard error
+groundhog.library("naniar", "2021-09-30") # for missing data
+
+
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+
+```
+
+``` {r set rounding}
+basic_dec <- 0
+data_dec <- 2
+stat_dec <- 3
+tabwidth = 0.8
+
+ 
+```
+
+``` {r cbf_palette}
+# Creating a colour-blind friendly palette for increased useability
+
+cbp2 <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+```
+
+
+
+
+# Analysis Methods
+
+## Overall analytical approach
+
+THIS IS FROM THE MAIN ONE
+THIS IS FROM THE MAIN ONE
+THIS IS FROM THE MAIN ONE
+THIS IS FROM THE MAIN ONE
+THIS IS FROM THE MAIN ONE
+THIS IS FROM THE MAIN ONE
+
+```{r temp1}
+options(prompt = '> ')
+```
+
+```{r launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
+# This is the cleaning and pre-processing described above.
+# source("./scripts/SBEP_staff_script_q3.R", print.eval = FALSE, echo = TRUE, keep.source = TRUE)
+#
+# source("./scripts/SBEP_staff_script_q3.R", echo = FALSE)
+
+```
+
+
+
+
+
+## Patient data
+
+
+
+
+# Results
+
+
+
+
+
+
+
+
+```{r session-info, eval=FALSE}
+sessionInfo()
+```

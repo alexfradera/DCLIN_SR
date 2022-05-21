@@ -1,0 +1,23 @@
+---
+title: "SBEP Data Report - Rendered Version"
+author: "2509920F"
+date: "XXXXXXX"
+output:
+  bookdown::word_document2:
+    fig_caption: yes 
+    reference_docx: SBEP_Template.docx
+  word_document:
+    fig_caption: yes
+    reference_docx: SBEP_Template.docx
+bibliography: '/Users/alexf/OneDrive - University of Glasgow/DClin/Deliverables/SBEP/SBEPBiblio2.bib'
+csl: 'C:/Users/alexf/OneDrive - University of Glasgow/non-dclin/R library/csl/neuropsychology.csl'
+#always_allow_html: yes
+---
+
+
+
+
+
+```{r, child='SR_Report_Body.rmd'}
+```
+

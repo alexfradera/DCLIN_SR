@@ -1,0 +1,101 @@
+---
+title: "Appendix for SBEP Data Report"
+author: "2509920F"
+date: "XXXXXXX"
+output:
+  word_document: 
+    reference_docx: SBEP_Template.docx
+  html_document:
+    df_print: paged
+csl: "C:/Users/alexf/OneDrive - University of Glasgow/non-dclin/R library/csl/sage-harvard.csl"
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require("knitr")
+opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above 
+```
+
+
+PERSONAL USE:
+https://www.notion.so/puttingintowords/SBEP-Brief-report-based-on-existing-dataset-d35dc7332ff3489fba7781bc11ae87d2
+
+Helpful walkthrough for reporting correlations in text https://psyteachr.github.io/msc-conv-f2f/rm2-r-markdown-correlations.html
+https://rdrr.io/github/m-Py/prmisc/src/R/print_chi2.R
+
+Sensitivity Analyses
+
+
+
+## What this is
+This is the full R code and outputs for the Data Report for Audit of a New Telephone Triage System in a Psychological Therapies Team: Impact on Service Access, Efficiency, and Staff Absence and Stress'"
+
+All data analysis was completed using R in the program RStudio, and this appendix was generated as a Rmarkdown document, which makes it easy to combine formatted text like this with the code used to conduct the analysis and the output from that analysis.
+
+Code is formatted to look like this:
+
+```{r example, include=TRUE, echo=TRUE, eval=FALSE}
+print("Hello")
+2+2
+```
+
+Output of computations will appear in the text like this:
+```{r two_plus, include=TRUE, echo=FALSE, eval=TRUE}
+print("Hello")
+2+2
+```
+
+I can also just use the code to compute `r 2+2`
+
+## Start of code
+Need to figure out whether I am going to bring the scripts in using *source* or run them, save an RData file and then use *load* (in a similar way) instead...
+
+
+
+```{r test_script}
+source("./scripts/SBEP_patient_script.R")
+```
+
+Note: Other options for code helpers
+
+Modular .R scripts: For bigger projects, I often break my R scripts down into smaller scripts, e.g.,
+
+    1_tidy.R, 2_models.R, 3_plots.R
+
+In my workflows, each of these sources the last. I.e., the first line of 2_models.R is
+
+source("1_tidy.R")
+
+And in my R Markdown file, I source the highest level or a final .RData file.
+
+## In text stuff
+The average number of days people waited was `r  round(mean(ap_patients$RTT_duration), digits=0)` but note that isn't grouped yet.
+
+title: "Untitled"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
