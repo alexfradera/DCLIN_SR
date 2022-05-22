@@ -1,7 +1,7 @@
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 require("knitr")
 opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
 ```
@@ -11,48 +11,51 @@ opts_knit$set(root.dir = "..") #  I put this in to raise up the working director
 
 ```{r pander_tweaks, include=FALSE}
 
-library(datapasta) # Ctrl + Shift + t OR Ctrl + Alt + Shift + v for vector
-library(groundhog)
-groundhog.library("tidyverse", "2021-09-30")
-groundhog.library("haven", "2021-09-30")
-groundhog.library("forcats", "2021-09-30")
-groundhog.library("lubridate", "2021-09-30")
-groundhog.library("RColorBrewer", "2021-09-30")
-groundhog.library("gcookbook", "2021-09-30")
-groundhog.library("purrr", "2021-09-30")
-groundhog.library("viridis", "2021-09-30")
-groundhog.library("captioner", "2021-09-30")
-groundhog.library("dplyr", "2021-09-30")
-groundhog.library("broom", "2021-09-30") # tidy statistical outputs
-groundhog.library("qqplotr", "2021-09-30")
-groundhog.library("stringr", "2021-09-30") # helping wrap title text
-groundhog.library("ggpubr", "2021-09-30") # making it easier to arrange graphs, eg for q3
-# groundhog.library("gt", "2021-09-30") unsure if needed - for certain table philosophy...
-groundhog.library("questionr", "2021-09-30")
-groundhog.library("janitor", "2021-09-30")
-groundhog.library("reshape2", "2021-09-30")
-groundhog.library("arsenal", "2021-09-30")
-groundhog.library("bookdown", "2021-09-30")
-groundhog.library("knitr", "2021-09-30")
-groundhog.library("flextable", "2021-09-30")
-groundhog.library("officer", "2021-09-30")
-groundhog.library("captioner", "2021-09-30")
-groundhog.library("pander", "2021-09-30")
-groundhog.library("papaja", "2021-09-30") #  Prepare APA journal articles with R Markdown
-groundhog.library("rstatix", "2021-09-30")
-groundhog.library("pwr", "2021-09-30")# for power analysis
-groundhog.library("ccoptimalmatch", "2021-09-30")
-groundhog.library("glue", "2021-09-30")
-groundhog.library("psych", "2021-09-30") # for PCA
-groundhog.library("plotrix", "2021-09-30") # for standard error
-groundhog.library("naniar", "2021-09-30") # for missing data
-
-
-panderOptions('table.alignment.default', function(df)
-    ifelse(sapply(df, is.numeric), 'right', 'left'))
-panderOptions('table.split.table', Inf)
-panderOptions('big.mark', ",")
-panderOptions('keep.trailing.zeros', TRUE)
+# library(datapasta) # Ctrl + Shift + t OR Ctrl + Alt + Shift + v for vector
+# library(groundhog)
+# set.groundhog.folder('C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin')
+# set.groundhog.folder('C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/groundhog_library')
+# groundhog.library('stringi','2021-09-30') # this is to try and get around a dependency issue with tidyverse
+# groundhog.library("tidyverse", "2021-09-30")
+# groundhog.library("haven", "2021-09-30")
+# groundhog.library("forcats", "2021-09-30")
+# groundhog.library("lubridate", "2021-09-30")
+# groundhog.library("RColorBrewer", "2021-09-30")
+# groundhog.library("gcookbook", "2021-09-30")
+# groundhog.library("purrr", "2021-09-30")
+# groundhog.library("viridis", "2021-09-30")
+# groundhog.library("captioner", "2021-09-30")
+# groundhog.library("dplyr", "2021-09-30")
+# groundhog.library("broom", "2021-09-30") # tidy statistical outputs
+# groundhog.library("qqplotr", "2021-09-30")
+# groundhog.library("stringr", "2021-09-30") # helping wrap title text
+# groundhog.library("ggpubr", "2021-09-30") # making it easier to arrange graphs, eg for q3
+# # groundhog.library("gt", "2021-09-30") unsure if needed - for certain table philosophy...
+# groundhog.library("questionr", "2021-09-30")
+# groundhog.library("janitor", "2021-09-30")
+# groundhog.library("reshape2", "2021-09-30")
+# groundhog.library("arsenal", "2021-09-30")
+# groundhog.library("bookdown", "2021-09-30")
+# groundhog.library("knitr", "2021-09-30")
+# groundhog.library("flextable", "2021-09-30")
+# groundhog.library("officer", "2021-09-30")
+# groundhog.library("captioner", "2021-09-30")
+# groundhog.library("pander", "2021-09-30")
+# groundhog.library("papaja", "2021-09-30") #  Prepare APA journal articles with R Markdown
+# groundhog.library("rstatix", "2021-09-30")
+# groundhog.library("pwr", "2021-09-30")# for power analysis
+# groundhog.library("ccoptimalmatch", "2021-09-30")
+# groundhog.library("glue", "2021-09-30")
+# groundhog.library("psych", "2021-09-30") # for PCA
+# groundhog.library("plotrix", "2021-09-30") # for standard error
+# groundhog.library("naniar", "2021-09-30") # for missing data
+# 
+# 
+# panderOptions('table.alignment.default', function(df)
+#     ifelse(sapply(df, is.numeric), 'right', 'left'))
+# panderOptions('table.split.table', Inf)
+# panderOptions('big.mark', ",")
+# panderOptions('keep.trailing.zeros', TRUE)
 
 ```
 
@@ -73,19 +76,145 @@ cbp2 <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
 
 ```
 
+# Abstract
 
 
 
-# Analysis Methods
+# Introduction
 
-## Overall analytical approach
 
-THIS IS FROM THE MAIN ONE
-THIS IS FROM THE MAIN ONE
-THIS IS FROM THE MAIN ONE
-THIS IS FROM THE MAIN ONE
-THIS IS FROM THE MAIN ONE
-THIS IS FROM THE MAIN ONE
+Cognitive screening tools are measures designed to give an indicator of general cognitive functioning through brief means. These either target one highly predictive ability or are addressed at a set of core domains (language, memory, orientation) using a minimal set of items for each. Measures considered cognitive screens are typically those that can be completed within 20 minutes (cite) and are not an alternative to fuller neuropsychological test batteries, which are more comprehensive and sensitive. While some screens are specialised towards a particular aetiology, others are used in a wide variety of contexts. Their usage tends to be at a more preliminary stage, such as gathering evidence when an older adult reports a memory complaint. They can nevertheless be used as a component of diagnosis, such as within dementia pathways in the UK where a low score on the Addenbrooke's Cognitive Examination can be the psychometric rationale for diagnosis, but even where it does not lead to definitive judgments, cognitive screening performance at least contributes to the decision whether more investigation is required. 
+
+
+<!-- ============================  -->
+
+# Method
+
+The study followed the PRISMA guidelines for reporting SRs and MAs (ZZZZZ Moher, Liberati, Tetzlaff, & Altman, 2009)
+
+ The protocol of the study was registered with the International Prospective Register of Systematic Reviews (PROSPERO) [registration number: CRD 42018109981] and published elsewhere (EG ZZZZ Martín-Gómez et al.,
+2020).
+
+## Search strategy
+
+Searches were conducted through the bibliographic databases Embase (1947-present), Medline (1946-present), and PsychInfo, as a mapping of articles identified in preliminary searches showed saturation by the use of these databases. OpenGrey (System for Information on Grey Literature in Europe) was additionally searched ??? Currently down.
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+The search was performed using the PICO model. It used medical headings and keywords associated with pain and cognitive screening instruments.Searches were initially piloted in PsychInfo before adaptation for use in the other databases. The search strategy for each database can be found in Appendix XXXX. PROSPERO and Epistimonikos were searched for similar ongoing or recently completed SRs.
+
+
+
+## Eligibility criteria
+
+The review focused on primary research that involved a participant group experiencing chronic pain and a control group without that experience. 
+Studies had to include participants completion of a cognitive screen. Definitions of cognitive screen are varied and the subject of a number of previous systematic reviews, and the decision was made to utilise a practitioner definition provided in  (REF: AZ society) which reports nine screens agreed by UK clinicians to be the focus of common clinical practice. Studies using different editions and language variants of these screens were also eligible. 
+
+Study design was not strictly defined, and could include cross-sectional designs as well as experimental designs including those introducing treatment such as medication, as long as cognitive screening information was available for both groups, and reporting was not clearly confounded by the impact of the treatment. This was rarely the case as screen information tended to be collected at baseline for these studies. 
+
+## Study selection
+After acquiring search results and removal of duplicates, two initial co-review stages were taken by reviewers 1 (AF) and 2 (JM): firstly to calibrate the eligibility checklist on 10 results and agree refinements, and then to independently screen 120 titles and abstracts against inclusion criteria, and then discuss discrepancies in judgment until reaching consensus on all cases, consulting with a third author where necessary.
+
+Following this step the full texts of retained studies were reviewed starting with an eligibility calibration on 2 papers, followed by independent screening of 20 further full texts by the same two reviewers, addressing discrepancies in a similar manner. Reviewer 1 then completed the full text review on all remaining results. Authors were contacted when full articles are unavailable (n=1).
+
+## Data extraction
+
+Relevant data included type of pain condition, participant details,  measures of pain and mood and scores on the cognitive screening test, as well as whether the test was key or incidental to the study (e.g. a baseline measure).
+
+Data was extracted by reviewer 1, with reviewer 2 performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after xxx.
+
+
+## Risk of bias 
+ <!-- this is not found in every one  -->
+
+## Assessment of publication bias ??
+<!-- this is not found in every one  -->
+
+Maybe only for those for which screening was key to the study
+
+## Data analysis
+
+## Quality of evidence / Quality assessment tool
+
+Study quality was assessed using the JBI Critical Appraisal Checklist for Analytical Cross Sectional Studies (REF). This scale rates studies on eight criteria such as inclusion criteria, description of study, outcome measurement and strategies to deal with confounding factors. The checklist includes items that required some translation to relevance for this review: for instance, measurement of exposure (treatment) did not have a bearing on quality of the cognitive screening data, but lack of clarity regarding the order of treatment and screening did. Supplementary guidance was constructed as can be seen in the appendix.
+
+<!-- ============================  -->
+
+# Results
+Include in table: 
+
+Study (first named author)
+Pain condition
+pain reporting
+Age c
+Age t
+n
+% gender? across both?
+Cognition:
+key
+SMD 
+reported sig?
+cut-off employed?
+mood diff that was not controlled for in some way (Yes/No/Unknown)
+medication diff
+
+## Study selection
+
+## Study characteristics
+<!-- this is not found in every one  -->
+
+## Participants 
+<!-- this is not found in every one  -->
+
+
+## Type of screen
+<!-- this is not found in every one  -->
+
+## Risk of bias of the included studies
+
+## Impact of chronic pain upon cognitive screen performance
+
+## Publication bias
+
+## Subgroup analysis, meta-regression and stratified meta-analysis
+
+## Confounds
+
+
+
+## Quality of evidence
+
+
+<!-- ============================  -->
+
+# Discussion
+<!-- some do not break down this way -->
+
+## Summary of findings
+
+## Comparison with previous research
+
+## Meaning and implications
+
+## Strengths and limitations
+
+## Future research
+
+ 
+
+
+
+
+I meanwhile wanted to quote  [@RefWorks:48]
+
 
 ```{r temp1}
 options(prompt = '> ')
