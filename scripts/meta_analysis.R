@@ -26,9 +26,10 @@ df <- tibble::tribble(
 )
 #====================
 
+# ==================
+# read in and get variables coherent 
 
 df <- read.xlsx("DATASETNAME.xlsx")
-
 glimpse(df)
 
 # factorise
@@ -37,27 +38,31 @@ df$cognitive.focus = as.factor(df$cognitive.focus)
 df$cognitive.exclusions = as.factor(df$cognitive.exclusions)
 levels(df$cognitive.name)
 
+
+# ==================
 # turn median scores into useable scores
+# uses estmeansd library and Box–Cox method from McGrath 2020
 
+# two quick functions - the key is to just extract the one returned value (eg $est.mean)
+# (otherwise it doesn't play well with vectors/dfs)
 
-                        
-# firstly a short function to redescribe proportions as percentages
-
-      
-      unmedian.mean<- function(min.v,med.v,max.v,the.n) {
-        set.seed(1)
-        return(bc.mean.sd(min.val = min.v, med.val = med.v, max.val = max.v, n = the.n)$est.mean)
+ unmedian.mean<- function(q1.v, med.v, q3.v, the.n) {
+        set.seed(1) # for reproducibility so the randomiser isn't affected
+        return(bc.mean.sd(q1.val = q1.v, med.val = med.v, q3.val = q3.v, n = the.n)$est.mean)
       }
       
-      unmedian.sd<- function(min.v,med.v,max.v,the.n) {
+ unmedian.sd<- function(q1.v, med.v, q3.v, the.n) {
         set.seed(1)
-        bc.mean.sd(min.val = min.v, med.val = med.v, max.val = max.v, n = the.n)$est.sd
+        bc.mean.sd(q1.val = q1.v, med.val = med.v, q3.val = q3.v, n = the.n)$est.sd
       }
-      
-      
+
+ # test      
+  unmedian.mean(2,4,6,100)   
 
 
-df9 <- df %>%
+# Use functions to produce new variables. 
+# NB this breaks when missing data, so just filtering non-missing and then recombine
+df2 <- df %>%
   filter(!is.na(cognitive.median.treat)) %>%
         mutate(
                 new.t.mean = unmedian.mean(cognitive.iqr1.treat, cognitive.median.treat, cognitive.iqr2.treat, n.treat),
@@ -66,32 +71,40 @@ df9 <- df %>%
                 new.c.sd = unmedian.sd(cognitive.iqr1.cont, cognitive.median.cont, cognitive.iqr2.cont, n.cont),
       )      
 
-df10 <- full_join(df9,df)
+df <- full_join(df2,df)
 
-
-df11 <- df10 %>% 
+# create a final variable for means and sds - if an original value missing it inserts the new one from step above
+df3 <- df %>% 
   mutate(
           fin.cognitive.mean.treat = ifelse(!is.na(cognitive.mean.treat),cognitive.mean.treat, new.t.mean),
           fin.cognitive.sd.treat = ifelse(!is.na(cognitive.sd.treat),cognitive.sd.treat, new.t.sd),
           fin.cognitive.mean.cont = ifelse(!is.na(cognitive.mean.cont),cognitive.mean.cont, new.c.mean),
           fin.cognitive.sd.cont = ifelse(!is.na(cognitive.sd.cont),cognitive.sd.cont, new.c.sd),
+          median.used = ifelse(!is.na(cognitive.mean.treat), "No", "Yes")
                     )
 
 # check - should be nas and zeros
 checks <- list(
-                (df11$fin.cognitive.mean.treat - df11$cognitive.mean.treat ),
-               (df11$fin.cognitive.sd.treat - df11$cognitive.sd.treat),
-               (df11$fin.cognitive.mean.cont - df11$cognitive.mean.cont),
-               (df11$fin.cognitive.sd.cont - df11$cognitive.sd.cont),
-               (df11$fin.cognitive.mean.treat - df11$new.t.mean ),
-               (df11$fin.cognitive.sd.treat - df11$new.t.sd),
-               (df11$fin.cognitive.mean.cont - df11$new.c.mean),
-               (df11$fin.cognitive.sd.cont - df11$new.c.sd)
+                (df3$fin.cognitive.mean.treat - df3$cognitive.mean.treat ),
+               (df3$fin.cognitive.sd.treat - df3$cognitive.sd.treat),
+               (df3$fin.cognitive.mean.cont - df3$cognitive.mean.cont),
+               (df3$fin.cognitive.sd.cont - df3$cognitive.sd.cont),
+               (df3$fin.cognitive.mean.treat - df3$new.t.mean ),
+               (df3$fin.cognitive.sd.treat - df3$new.t.sd),
+               (df3$fin.cognitive.mean.cont - df3$new.c.mean),
+               (df3$fin.cognitive.sd.cont - df3$new.c.sd)
                  )
 checks
 
+# if ok, finalise dataset:
+df <- df3
+
+rm(df2,df3,checks)
+
+
 
 # ====================================================
+# Meta-analysis
 
 # Use metcont to pool results.
 m.cont <- metacont(n.e = n.cont,
@@ -104,12 +117,81 @@ m.cont <- metacont(n.e = n.cont,
                    data = df,
                    sm = "SMD",
                    method.smd = "Hedges",
-                   comb.fixed = FALSE,
-                   comb.random = TRUE,
+                   fixed = FALSE, # if this doesn't work try comb.fixed. sometimes is having trouble with this
+                   random = TRUE, #ditto comb.random
                    method.tau = "REML",
                    hakn = TRUE,
-                   title = "Suicide Prevention")
+                   title = "Cognitive screens and chronic pain")
 summary(m.cont)
 print(m.cont)
 
 colnames(df)
+
+# Saving the Forest Plots
+# This can be tricky
+# https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/forest.html#saving-the-forest-plots
+# you need to call the save function and then do the thing:
+
+png(file = "forestplot.png", width = 2800, height = 2400, res = 300)
+
+# forest plot
+forest.meta(m.cont, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftcols = c("studlab", "cognitive.name"),
+            rightcols = c("effect","ci"),
+#            layout = "JAMA",
+#            layout = "RevMan5",
+            #leftlabs = c("studlab", "TE"),
+            #rightlabs = c("studlab", "TE"),
+            label.left = "pain ~ poorer cog",
+            label.right = "pain ~ better cog"
+            )
+#and then deactivate the png-mode
+dev.off()
+
+
+# =======================================
+# Funnel plot
+
+# Firstly create a dataset with only those studies where the use of screen was central
+ df_key <- df %>%
+    filter(cognitive.focus == "key")
+
+m.key <- metacont(n.e = n.cont,
+                   mean.e = fin.cognitive.mean.treat,
+                   sd.e = fin.cognitive.sd.treat,
+                   n.c = n.cont,
+                   mean.c = fin.cognitive.mean.cont,
+                   sd.c = fin.cognitive.sd.cont,
+                   studlab = study.id,
+                   data = df_key,
+                   sm = "SMD",
+                   method.smd = "Hedges",
+                   fixed = FALSE, # if this doesn't work try comb.fixed. sometimes is having trouble with this
+                   random = TRUE, #ditto comb.random
+                   method.tau = "REML",
+                   hakn = TRUE,
+                   title = "Cognitive screens part of study focus")
+
+
+
+
+funnel.meta(m.key,
+            xlim = c(-0.5, 2),
+            studlab = TRUE)
+
+# Add title
+title("Funnel Plot (Chronic pain on cognitive screens - focused studies)")
+
+# do a contour plot to point out which studies were more significant
+col.contour = c("gray75", "gray85", "gray95")
+
+funnel.meta(m.key, xlim = c(-0.5, 2),
+            contour = c(0.9, 0.95, 0.99),
+            col.contour = col.contour)
+legend(x = 1.6, y = 0.01, 
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour)
+title("Funnel Plot (Chronic pain on cognitive screens - focused studies)")

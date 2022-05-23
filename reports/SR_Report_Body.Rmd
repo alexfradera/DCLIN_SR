@@ -63,6 +63,7 @@ Relevant data included type of pain condition, participant details,  measures of
 
 Data was extracted by reviewer 1, with reviewer 2 performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after xxx.
 
+Where data was presented in the form of median and inter-quartile range, this was converted into estimated mean and standard deviation using the estmeansd r package using the Box–Cox method described in @McGrath2020.
 
 ## Risk of bias 
  <!-- this is not found in every one  -->
