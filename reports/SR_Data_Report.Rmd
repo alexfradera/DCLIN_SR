@@ -1,0 +1,38 @@
+---
+title: "Systematic Review"
+author: "2509920F"
+date: "`sa"
+output: 
+  officedown::rdocx_document:
+     reference_docx: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_Template.docx'
+     tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      caption:
+       style: Table Caption
+       pre: 'Table '
+       sep: ': '
+      conditional:
+       first_row: true
+       first_column: false
+       last_row: false
+       last_column: false
+       no_hband: false
+       no_vband: true
+bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_biblio.bib'
+csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
+---
+
+
+
+```{r include=FALSE}
+library(officedown)
+```
+
+
+```{r, child='SR_exec_summary.rmd'}
+```
+
+```{r, child='SR_Report_Body.rmd'}
+```

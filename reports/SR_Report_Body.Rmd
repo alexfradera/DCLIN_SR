@@ -7,7 +7,7 @@ opts_knit$set(root.dir = "..") #  I put this in to raise up the working director
 ```
 
 
-
+`citation("psychmeta")` etc
 
 
 # Abstract
@@ -77,7 +77,10 @@ Maybe only for those for which screening was key to the study
 
 ## Quality of evidence / Quality assessment tool
 
-Study quality was assessed using the JBI Critical Appraisal Checklist for Analytical Cross Sectional Studies (REF). This scale rates studies on eight criteria such as inclusion criteria, description of study, outcome measurement and strategies to deal with confounding factors. The checklist includes items that required some translation to relevance for this review: for instance, measurement of exposure (treatment) did not have a bearing on quality of the cognitive screening data, but lack of clarity regarding the order of treatment and screening did. Supplementary guidance was constructed as can be seen in the appendix.
+Study quality was assessed using the JBI Critical Appraisal Checklist for Analytical Cross Sectional Studies (REF). This scale rates studies on eight criteria such as inclusion criteria, description of study, outcome measurement and strategies to deal with confounding factors. The checklist includes items that required some translation to relevance for this review, which was supplied to both reviewers as supplementary guidance that can be found in appendix.
+
+
+
 
 <!-- ============================  -->
 
@@ -91,31 +94,26 @@ library("flextable")
 library("ftExtra")
 library("dplyr")
 library("officer")
+library(openxlsx)
 
-dat2 <- tibble::tribble(
-                ~biblio, ~Order, ~study.id, ~extraction.date,    ~reviewer.stage,                                                                                                                                                                      ~author,                                                                                                             ~title,   ~country,
-          "AlMalki2020",     9L,  "ALM009",           44624L, "full-text-review",                                                                                 "Al-Malki,Daifallah;Kotb,Mamdouh Ali;Kamal,Ahmed M.;Abd El Fatah, Aliaa S.;Ahmed,Yassmin M.", "Cognitive performance in patients with chronic tension-type headache and its relation to neuroendocrine hormones",   "Egypt?",
-          "Cardoso2021",    16L,  "APA016",           44624L,       "pre-search",                   "Apagueno,Brandon;Hoyos,Lorraine;Cardoso,Josue;Lysne,Paige;Riley,Joseph L.;Fillingim,Roger B.;Porges,Eric;Woods,Adam J.;Cohen,Ronald;Cruz-Almeida,Yenisel",                                                       "Pain and the Montreal Cognitive Assessment (MoCA) in Aging",      "USA",
-  "BarceloMartinez2018",    26L,  "BAR026",           44624L, "full-text-review", "Barceló-Martinez,Ernesto;Gelves-Ospina,Melissa;Lechuga,Edgar Navarro;Allegri,Ricardo F.;Orozco-Acosta,Erick;Benítez-Agudelo,Juan C.;León-Jacobus,Alexandra;Román,Néstor F.",                 "Serum cortisol levels and neuropsychological impairments in patients diagnosed with fibromyalgia", "Colombia"
-  )
-
-dat3 <- dat2 %>%
-  mutate(biblio_comp = paste0("@",biblio))
+#overview <- read.xlsx("data/study_overview_sheet.xlsx")
+overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/data/study_overview_sheet.xlsx")
 
 
-#dat3 <- dat2 %>%
-#  select(author, study.id, biblio_comp)
+glimpse(overview)
 
 
 
+overview <- overview %>%
+   mutate(biblio_comp = paste0("@",biblio))
+ 
+ 
+ overview %>%
+   select(study_id, biblio_comp) %>%
+   flextable() %>%
+   colformat_md() %>%
+   autofit()
 
-
-test <- dat3 %>%
-  flextable() %>%
-  colformat_md() %>%
-  autofit()
-
-test 
 
 ```
 
@@ -152,6 +150,8 @@ medication diff
 <!-- this is not found in every one  -->
 
 ## Risk of bias of the included studies
+
+The evaluation of confounders reported above does not include mood or anxiety. These two features are considered prevalent and co-occurring symptoms with pain, forming part of a symptom cluster [@Davis2016] together. Accordingly, mood was significantly higher for the pain group in ` R CODE ` of the studies, with `R CODE` not reporting mood and only ` x` explicitly matching. Anxiety was rated in only `R CODE` of the studies and was significantly different in `R CODE`.
 
 ## Impact of chronic pain upon cognitive screen performance
 
