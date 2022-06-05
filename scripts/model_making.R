@@ -1,10 +1,15 @@
+# SBEP_staff_script_q3
+
+source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\vi_yi.R")
 
 # ===============================
 # Models
 
 # simple random-effects model
-res <- rma(yi, vi, data=dfm_mod)
-res
+simple <- rma(yi, vi, data=dfm_mod)
+simple
+
+forest(simple, slab = dfm_mod$author_final)
 
 # ====================================================
 # Preparing data for CHE model
@@ -44,7 +49,7 @@ cov2cor(V[dfm_mod$study_num == 89, dfm_mod$study_num == 89])
 cov2cor(V[dfm_mod$study_num == 121, dfm_mod$study_num == 121]) # MMSE and MOCA
 cov2cor(V[dfm_mod$study_num == 134, dfm_mod$study_num == 134]) # MMSE and TYM for part of it
 cov2cor(V[dfm_mod$study_num == 182, dfm_mod$study_num == 182]) # MMSE and MOCA
-cov2cor(V[dfm_mod$study_num == 192, dfm_mod$study_num == 192]) # MMSE and MOCA
+
 
 
 # Raw CHE model:
@@ -66,6 +71,14 @@ che.model_N <- rma.mv(yiN ~ 1,
                     data = dfm_mod,
                     sparse = TRUE)
 
+# The function computes predicted values, corresponding standard errors, confidence intervals, and prediction intervals 
+# This produces the key outcomes.
+study_outputs <- predict(che.model_N, digits=2)
+
+
+
+# use robust inference methods based on this model
+robust(che.model_N, cluster=study_id, clubSandwich=TRUE)$beta
 
 # can also add a potential covariate
 che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
@@ -75,8 +88,9 @@ che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
                      sparse = TRUE)
 
 # alternative - pain group
-che.model3 <- rma.mv(yi ~ 1 + sample_treat_cat,
+che.model3 <- rma.mv(yi ~ 1 + age_mean_cont,
                      V = V,
                      random = ~ 1 | study_num/unique_id,
                      data = dfm_mod,
                      sparse = TRUE)
+

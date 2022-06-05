@@ -3,14 +3,28 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 require("knitr")
-opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
+# opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
 ```
 
 
-`citation("psychmeta")` etc
+```{r launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
+# This is the cleaning and pre-processing described above.
+# source("./scripts/SBEP_staff_script_q3.R", print.eval = FALSE, echo = TRUE, keep.source = TRUE)
+ # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
+
+
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
+
+
+# citation("metafor") etc
+
+```
+
+
 
 
 # Abstract
+
 
 
 
@@ -59,17 +73,28 @@ Following this step the full texts of retained studies were reviewed starting wi
 
 ## Data extraction
 
-Relevant data included type of pain condition, participant details,  measures of pain and mood and scores on the cognitive screening test, as well as whether the test was key or incidental to the study (e.g. a baseline measure).
+Relevant data included type of pain condition, participant details,  measures of pain and mood and scores on the cognitive screening test, as well as whether the test was key or incidental to the study (e.g. a baseline measure). The cognitive screen data extracted was in the form of reported means and standard deviations; where data was presented in the form of median and inter-quartile range, this was converted into estimated mean and standard deviation using the estmeansd r package using the Box–Cox method described in @McGrath2020.
 
-Data was extracted by reviewer 1, with reviewer 2 performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after xxx.
+Data was extracted by A.F, with J.M performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after 8 papers.
 
-Where data was presented in the form of median and inter-quartile range, this was converted into estimated mean and standard deviation using the estmeansd r package using the Box–Cox method described in @McGrath2020.
+## Statistical analyses
+
+Cognitive screen means and standard deviations were used to compute standardised mean differences in the form of Hedge's g using the approach described by @Hedges1985. Scores reflect the size of effect for membership of the chronic pain group versus control with a larger score reflecting greater impairment in the chronic pain group.
+
+A number of studies reported more than one comparison of cognitive screen scores that fit the review criteria due to multiple chronic pain groups compared to one or multiple control groups or two cognitive screens administered across participants.  In most instances this led to generating multiple standard mean differences per study, leading to interdependency between outcomes. This was addressed by introducing to the model a  covariance matrix estimating these interdependencies, including information about the relationships between cognitive screen scores. In one case, it was judged that groups could be more appropriately merged to produce a single standardised mean difference. 
+This is described in appendix XXXXX.
+
+The metafor package and 
+[@Viechtbauer2010]
+
+In order to examine potential sources of variance between studies, a meta-regression approach was used to estimate the influence of potential moderators on the overall effect size. These were cognitive screen, chronic pain classification, age and disease duration.
+
 
 ## Risk of bias 
  <!-- this is not found in every one  -->
 
 ## Assessment of publication bias ??
-<!-- this is not found in every one  -->
+
 
 Maybe only for those for which screening was key to the study
 
@@ -82,12 +107,11 @@ Study quality was assessed using the JBI Critical Appraisal Checklist for Analyt
 
 
 
-<!-- ============================  -->
 
 # Results
 
- <!-- ================== https://ardata-fr.github.io/officeverse/officedown-for-word.html#insert-sections==========  -->
-<!---BLOCK_LANDSCAPE_START--->
+
+## Study selection
 
 ``` {r, echo = F}
 library("flextable")
@@ -96,54 +120,68 @@ library("dplyr")
 library("officer")
 library(openxlsx)
 
-#overview <- read.xlsx("data/study_overview_sheet.xlsx")
+set_flextable_defaults(
+  font.size = 10, theme_fun = theme_vanilla,
+  padding = 6,
+  background.color = "#EFEFEF")
+
+
 overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/data/study_overview_sheet.xlsx")
-
-
-glimpse(overview)
-
-
-
 overview <- overview %>%
-   mutate(biblio_comp = paste0("@",biblio))
- 
- 
- overview %>%
-   select(study_id, biblio_comp) %>%
-   flextable() %>%
-   colformat_md() %>%
-   autofit()
+  mutate(biblio_comp = paste0("@",biblio))
+
+pres_overview <- select(overview, study_id, biblio_comp)
+
+pres_dat <- dfm_e %>%
+  select(study_id, sample_treat, n_treat, age_mean_treat, age_sd_treat,  n_cont, matching_education, cognitive_name )
+
+test <- left_join(pres_dat,pres_overview, by="study_id")
+test <- test %>%
+  arrange(biblio_comp) %>%
+  relocate(biblio_comp) %>%
+  select(!study_id)
+
+test <- test %>%
+  mutate(age_mean_treat = round(age_mean_treat, 2),
+         age_sd_treat = round(age_sd_treat, 2),
+         age_sum_treat = paste0(age_mean_treat," (",age_sd_treat,")")
+         )
 
 
+tab1 <- test %>%
+  select(!c(age_mean_treat,age_sd_treat)) %>%
+  arrange(biblio_comp) %>%
+  relocate(biblio_comp) %>%
+  flextable() %>%
+  colformat_md() %>%
+  autofit()
+tab1 <- set_table_properties(tab1, layout = "autofit")
+set_header_labels(tab1, 
+                  biblio_comp = "Authors", 
+                  sample_treat = "Pain group",
+                  n_treat = "Patient group size",
+                  n_cont = "Control group size",
+                  cognitive_name = "Screen",
+                  age_sum_treat = "Patient age; mean (sd)")
+                  
+
+# put this outside the block to work <!---BLOCK_LANDSCAPE_START---> <!---BLOCK_LANDSCAPE_STOP--->
+# as per https://ardata-fr.github.io/officeverse/officedown-for-word.html#insert-sections
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
 
 
-Include in table: 
 
-Study (first named author)
-Pain condition
-pain reporting
-Age c
-Age t
-n
-% gender? across both?
-Cognition:
-key
-SMD 
-reported sig?
-cut-off employed?
-mood diff that was not controlled for in some way (Yes/No/Unknown)
-medication diff
 
-## Study selection
 
 ## Study characteristics
-<!-- this is not found in every one  -->
+
+There were `r sum(dfm_mod$cognitive_focus=="key")` comparisons where the screen was critical to the study focus and `r sum(dfm_mod$cognitive_focus=="incidental")` where the screen was used incidentally.
 
 ## Participants 
 <!-- this is not found in every one  -->
+
+NEED A 
 
 
 ## Type of screen
@@ -155,7 +193,83 @@ The evaluation of confounders reported above does not include mood or anxiety. T
 
 ## Impact of chronic pain upon cognitive screen performance
 
+
+
+
+Cognitive screen score standard mean differences within the dataset ranged from `r round(min(dfm_mod$yiN),2)` to `r round(max(dfm_mod$yiN),2)` as shown in the histogram below.
+
+``` {r, histos, echo = F}
+#dfm_mod %>%
+#  ggplot(mapping = aes(x=yi)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
+
+dfm_mod %>%
+  ggplot(mapping = aes(x=yiN)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
+```
+
+
+The average standard mean difference derived from the model was `r format(round(study_outputs$pred, 2), nsmall = 2)` with the 95% confidence interval ranging from `r format(round(study_outputs$ci.lb, 2), nsmall = 2)` to `r format(round(study_outputs$ci.ub, 2), nsmall = 2)`.
+
+Analysis suggested that the true effects were heterogeneous (Q = `r round(che.model_N$QE,2)`, p < 0.0001). This was chiefly due to differences in true effects of studies (`r round(che.model_N$sigma2[1],2)`) with small levels of within-study heterogeneity (`r round(che.model_N$sigma2[2],2)`).
+
+
+
+```{r, violins, echo=F}
+ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
+  scale_x_continuous(breaks=NULL) +
+  theme(axis.title.x = element_blank()) + ylab("effect size")
+```
+
+
+
+
+``` {r, forester, echo = F}
+
+forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)  # the cbind.data.frame is to stop factor returning as integers
+```
+
+
+
+
+``` {r, forester2, echo = F}
+
+forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = "obs")  # the cbind.data.frame is to stop factor returning as integers
+```
+
+``` {r, forester2, echo = F}
+
+che.model_N_small <- che.model_N
+
+che.model_N_small$vi.f <- che.model_N_small$vi.f[1:25]
+
+
+forest(che.model_N_small, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)
+
+```
+
+
+
 ## Publication bias
+
+
+``` {r, funnelling, echo = F}
+ dfm_key<- dfm_mod %>%
+    filter(cognitive_focus == "key")
+
+res_key <- rma(yi, vi, data=dfm_key)
+res_tri <- trimfill(res_key)
+funnel(res_tri, legend= TRUE, main = "Funnel Plot (focused studies)")
+
+# what about without outlier?
+dfm_key_out <- filter(dfm_mod, yi <3)
+
+res_key_out <- rma(yi, vi, data=dfm_key_out)
+res_tri_out <- trimfill(res_key_out)
+funnel(res_tri_out, legend= TRUE, main = "Funnel Plot (focused studies) - no outlier") 
+
+```
 
 ## Subgroup analysis, meta-regression and stratified meta-analysis
 

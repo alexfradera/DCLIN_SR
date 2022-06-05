@@ -1,3 +1,8 @@
+
+
+source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\medians_means.R")
+
+
 # ============
 # Creating yi and vi (effects and variances)
 
@@ -62,3 +67,22 @@ select(dfm_e3,study_id, comp,n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_
 # vi and viN are similar (but not identical) and vary from se (ok, as they are different measures)
 
 dfm_mod <- dfm_e3
+
+# ===========================
+# Plotting out effect sizes
+
+
+# relationship with age
+dfm_mod %>%
+  filter(yi < 2.5) %>%
+  ggplot(mapping = aes(x=age_mean_cont,y=yi)) + geom_point() + stat_smooth(method=lm)
+
+
+
+
+outliers <- dfm_mod %>%
+  filter(yi > 2) %>%
+  select(1:25,yi,cognitive_mean_cont,cognitive_sd_cont, cognitive_mean_treat,cognitive_sd_treat)
+
+#These were cognitive screen, chronic pain classification, age and disease duration.
+
