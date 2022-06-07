@@ -1,0 +1,212 @@
+---
+title: "Systematic Review Appendix materials"
+author: "2509920F"
+date: "`sa"
+output: 
+  officedown::rdocx_document:
+     reference_docx: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_Template.docx'
+     tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      caption:
+       style: Table Caption
+       pre: 'Table '
+       sep: ': '
+      conditional:
+       first_row: true
+       first_column: false
+       last_row: false
+       last_column: false
+       no_hband: false
+       no_vband: true
+bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_biblio.bib'
+csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+require("knitr")
+# opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
+```
+
+
+```{r, launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
+# This is the cleaning and pre-processing described above.
+# source("./scripts/SBEP_staff_script_q3.R", print.eval = FALSE, echo = TRUE, keep.source = TRUE)
+ # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
+
+
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
+
+
+# citation("metafor") etc
+
+```
+
+# Data checking
+```{r, mean_distro}
+dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_mean_treat, fill = cognitive_name)) + geom_histogram(binwidth = 2, alpha = 0.4)  
+# , fill = "wheat", color = "black"
+```
+
+
+```{r, sd_distro by screen}
+#dfm2 %>%
+#  group_by(cognitive_name) %>%
+#  summarize(mean = mean(cognitive_sd_treat))
+```
+
+
+
+```{r, sd_distro}
+dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_sd_treat, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4) 
+```
+```{r, control_mean}
+dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_mean_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .2, alpha = 0.4)  
+```
+ 
+```{r, control_sd}
+dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_sd_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .2, alpha = 0.4)  
+```
+
+
+
+
+# Initial raw model estimates
+
+A random effects model was fitted to the data and generated the below: 
+``` {r, simplemod, echo = F}
+simple <- rma(yi, vi, data=dfm_mod)
+
+
+simple
+
+
+```
+
+The summary information for this model (effect, s.e, confidence and prediction intervals are) 
+
+```{r, simpleout}
+predict(simple, digits=2)
+```
+
+
+
+# Presence of multiple comparisons
+
+Some studies offered more than one relevant comparison leading to extraction of multiple effect sizes in these cases. The table below summarises which studies provided multiple estimates.
+``` {r, repeaters, echo = F}
+
+
+
+wide_repeats <-repeats %>%
+pivot_wider( names_from = cognitive_name,
+                             values_from = sample_treat)
+
+
+wide_repeats2 <- wide_repeats %>%
+  ungroup %>%
+  select(!c(unique_id,study_id, comp,sample_cont)) 
+
+
+wide_repeats3 <- wide_repeats2 %>%
+  mutate(grouper = c(1,2,9,10,3,4,5,6,7,8,13,14,11,12)) %>%
+  arrange(grouper)
+
+
+repeattab <- flextable(select(wide_repeats3, !grouper))
+repeattab <- set_table_properties(repeattab, layout = "autofit")
+repeattab
+
+authors <- (wide_repeats3$author_final)
+condition  <- (wide_repeats3$MMSE)
+
+```
+
+In (three) studies, multiple groups were compared against the same set of healthy controls: `r authors[1]` for `r condition[1]` and `r condition[2]`, and `r authors[3]` for `r condition[5]`, `r condition[3]` and `r condition[4]`. As the control group data was used repeatedly for these comparisons, the effect size estimates are correlated (due to the correlation of the sampling error of these estimates).
+
+In `r authors[3]` multiple  screens were taken, the  MMSE and Test Your Memory screens. The remaining multiple comparisons involved a single control group and patient group for both the MMSE and MoCA - `r authors[9]` `r authors[11]`.
+
+One further study, `r authors[13]` involved two separate pain groups each with a matched control group. The factor differentiating these pairs was a variable not relevant to this review (whether the individuals acted as caregivers) and the decision was made that this source of data would be better incorporated into the model as a single pair; accordingly these were merged using the functions below.
+
+<!--- In one study results were given separately for one control-treatment group pairing and again for another, with no overlap between participants [@Terassi2021]; as the differences between groups were not material to the review (a care-giver pair and non-care-giver pair) the decision was made to merge together the two control groups and do the same for the two treatment groups. --->
+
+
+``` {r, combining, echo = T}
+mean_function <- function(m1,m2,n1=size1,n2=size2){
+                          ((n1*m1) + (n2*m2))/(n1+n2) }
+
+sd_function <- function(m1,m2,s1,s2,n1=size1,n2=size2){
+                         sqrt(((n1-1)*s1^2 + (n2-1)*s2^2 + n1 * n2 / (n1 + n2) * (m1^2 + m2^2 - 2 * m1 * m2)) / (n1 + n2 -1)) }
+```
+
+# Correcting for multiple comparisons
+
+[*NB the guidance I followed suggested that as part of preparing for this analysis, I should recalculate a grand N based on all groups within the study and use this to calculate variance - see https://www.metafor-project.org/doku.php/analyses:gleser2009, about half-way down under heading* **Quantitative response variables**: *"In addition, the total sample sizes of the individual studies are needed for further computations" etc. I am not sure of the rationale for this and cannot tell by reading up other examples whether the variances have been calculated in this way. Also using this version computes the effect sizes by hand using shared standard deviation measure and doing so I do not get quite identical scores: see below. es, yi and yiN are all effect sizes from different calculations, you can see that the effect size from the grand N is somewhat different from the other two. vi and viN are the two variance calculations, again they differ. This is more striking for the multiple comparison example (FAY089) but even the other ones are changed... which concerns me a little!*
+
+```{r, different_effects}
+dfm_e3 %>%
+select(study_id, n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat, sdpi, es,yi, yiN, vi,viN)   %>%
+  slice(11:19)
+
+```
+[*NB this is the code I have used to create this. the viN one seems strange to me - missing a bracket? But I have copied the reference in the above link and can't find guidance on any other way to do this....*]
+
+```{r, echo=TRUE}
+dfm_e3 <- dfm_e3 %>%
+  mutate(
+    sdpi = sqrt(((n_cont-1)*cognitive_sd_cont^2 + (n_treat-1)*cognitive_sd_treat^2) / (n_cont+n_treat-2)),
+    yiN  = (cognitive_mean_cont-cognitive_mean_treat)/sdpi,
+    viN = 1/n_cont+ 1/n_treat + yi^2/(2*Ni)
+  )
+```
+
+*so I have been using a variant of*]
+
+A correlation matrix was produced based on published relationships between cognitive screens: MoCA with MMSE [@Nasreddine2005], MMSE with ACE (ACE-III) [@MatiasGuiu2017], MMSE with TYM [@Zande2017]. Other relationships were estimated but are not actually required as these relationships are not relevant for these studies.
+
+```{r, callingR}
+R
+```
+
+
+
+# Other Interaction effects?
+
+There is a lot more that could be looked at, I will continue to explore but here are some thoughts.
+
+## Pain
+
+There are a wide range of measures taken as shown below. Measures have been presented as negative when higher scores represent better health/lower pain.
+
+```{r pain_measures, echo=TRUE}
+dfm_mod %>%
+  group_by(pain_measure) %>%
+  summarise(
+            mean = mean(pain_mean_treat, na.rm = TRUE),
+            count = n()
+                        )
+```
+
+
+``` {r, pain}
+dfm_mod %>%
+  mutate(
+    sta_pain = ifelse(pain_measure == "PVAS (0-100)", (pain_mean_treat*.1)/(pain_sd_treat*.1), pain_mean_treat/pain_sd_treat),
+    raw_pain = ifelse(pain_measure == "PVAS (0-100)", (pain_mean_treat*.1), pain_mean_treat)) %>%
+  group_by(pain_measure) %>%
+  filter(n()>2) %>%
+  ggplot(mapping = aes(x=raw_pain,y=yi, colour =pain_measure)) + geom_point() + stat_smooth(method=lm, se= FALSE)
+
+```
+
+
+
+
+
+

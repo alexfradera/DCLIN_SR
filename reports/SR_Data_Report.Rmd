@@ -30,9 +30,10 @@ csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Co
 library(officedown)
 ```
 
-
+<!----
 ```{r, child='SR_exec_summary.rmd'}
 ```
+--->
 
 ```{r, child='SR_Report_Body.rmd'}
 ```

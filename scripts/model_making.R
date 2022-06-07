@@ -78,7 +78,61 @@ study_outputs <- predict(che.model_N, digits=2)
 
 
 # use robust inference methods based on this model
-robust(che.model_N, cluster=study_id, clubSandwich=TRUE)$beta
+robust(che.model_N, cluster=study_id, clubSandwich=TRUE)
+
+# check residuals
+rstudent(che.model_N)
+
+# ============================================================
+
+# adding more yi and vi for other measures
+
+multismd <- dfm_mod %>%
+  # filter(pain_measured_cont=="yes") %>%
+  mutate(yi_cog = yi,
+         vi_cog = vi) %>%
+  select(!c(yi,vi))
+
+multismd  <- escalc(measure="SMD",
+                    n1i = n_cont,
+                    m1i = pain_mean_cont, 
+                    sd1i = pain_sd_cont, 
+                    n2i = n_treat ,
+                    m2i = pain_mean_treat ,    # mean of group 2
+                    sd2i = pain_sd_treat,  # standard error of group 2
+                    data = multismd,
+                    vtype="AV") # this incorporates sample-size weighted average of Hedges'g values.
+multismd <- multismd %>%
+  mutate(yi_pain = yi,
+         vi_pain = vi) %>%
+  select(!c(yi,vi))
+
+multismd  <- escalc(measure="SMD",
+                    n1i = n_cont,
+                    m1i = age_mean_cont, 
+                    sd1i = age_sd_cont, 
+                    n2i = n_treat ,
+                    m2i = age_mean_treat ,    # mean of group 2
+                    sd2i = age_sd_treat,  # standard error of group 2
+                    data = multismd,
+                    vtype="AV") # this incorporates sample-size weighted average of Hedges'g values.
+multismd <- multismd %>%
+  mutate(yi_age = yi,
+         vi_age = vi) %>%
+  select(!c(yi,vi))
+
+## ======
+
+
+multismd %>% select(yi_pain, pain_mean_cont,pain_mean_treat)
+
+che.model_pain <- rma.mv(yi_cog ~ 1 + yi_pain,
+                     V = V,
+                     random = ~ 1 | study_num/unique_id,
+                     data = multismd,
+                     sparse = TRUE)
+
+
 
 # can also add a potential covariate
 che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
@@ -88,9 +142,50 @@ che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
                      sparse = TRUE)
 
 # alternative - pain group
-che.model3 <- rma.mv(yi ~ 1 + age_mean_cont,
+che.model_age <- rma.mv(yi ~ 1 + age_mean_cont,
                      V = V,
                      random = ~ 1 | study_num/unique_id,
                      data = dfm_mod,
                      sparse = TRUE)
+
+dfm_mod_sift <- dfm_mod %>%
+  filter(yi<3)
+siftV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+               obs=cognitive_name, rho=R, data=dfm_mod_sift)
+
+
+che.model_age_sift <- rma.mv(yi ~ 1 + age_mean_cont,
+                        V = siftV,
+                        random = ~ 1 | study_num/unique_id,
+                        data = dfm_mod_sift,
+                        sparse = TRUE)
+
+## ====
+# Models filtered by screen
+
+# MMSE model
+dfm_mmse <- dfm_mod %>%
+  filter(cognitive_name =="MMSE") %>%
+  mutate(author_final = str_trunc(author_final,19, "right"))
+
+mmseV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+               obs=cognitive_name, rho=R, data=dfm_mmse)
+
+che.model_mmse <- rma.mv(yiN ~ 1,
+                         V = mmseV,
+                         random = ~ 1 | study_num/unique_id,
+                         data = dfm_mmse,
+                         sparse = TRUE)
+# Other models
+dfm_screens <- dfm_mod %>%
+  filter(cognitive_name !="MMSE")
+
+screenV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+                 obs=cognitive_name, rho=R, data=dfm_screens)
+
+che.model_screens <- rma.mv(yiN ~ 1,
+                            V = screenV,
+                            random = ~ 1 | study_num/unique_id,
+                            data = dfm_screens,
+                            sparse = TRUE)
 

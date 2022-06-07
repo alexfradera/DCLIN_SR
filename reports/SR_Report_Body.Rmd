@@ -1,19 +1,19 @@
 
 
-```{r setup, include=FALSE}
+```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 require("knitr")
 # opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
 ```
 
 
-```{r launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
+```{r, launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
 # This is the cleaning and pre-processing described above.
 # source("./scripts/SBEP_staff_script_q3.R", print.eval = FALSE, echo = TRUE, keep.source = TRUE)
  # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
 
 
- source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid.R", echo = FALSE)
 
 
 # citation("metafor") etc
@@ -36,7 +36,8 @@ Cognitive screening tools are measures designed to detect cognitive impairment t
 Cognitive screens are not intended to be diagnostic, although low scores that corroborate clear deficits found in a clinical examination and interview may be considered sufficient without further cognitive investigation. Outside of this context, cognitive screen performance contributes to the decision whether more investigation is required. Key here is that cognitive screens are sufficiently sensitive - correctly identifying when followup is warranted, to maximise early diagnosis - and specific - avoiding putting people on an investigative pathway when this is not necessary [@Cullen2007].
 
 
-These concerns are relevant when a population lives with a cognition-affecting condition that is not the disease being screened for, such as experiencing chronic pain. Pain is known to affect performance on focused neuropsychologicalcognitive tests and batteries  (see xx for a review). This is likely to reflect a combination of depletion of resources, distracting effects of pain symptoms disrupting attention, and in the case of chronic pain possible longer-term changes to the nervous system either due to sustained pain or the condition that produces it. As chronic pain is more prevalent with aging, it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen responding.
+These concerns are relevant when a population lives with a cognition-affecting condition that is not the disease being screened for, such as experiencing chronic pain. People living with chronic pain are more likely to report problems with memory, attention or thinking [@McCracken2001]. Pain is known to affect performance on neuropsychological cognitive tests and batteries, some of which are summarised by @Moriarty2011, and include deficits in domains such as attention, information processing and executive function. Potential mechanisms for this include depletion of resources, distracting effects of pain symptoms disrupting attention, and in the case of chronic pain possible longer-term changes to the nervous system either due to sustained pain or the condition that produces it. Concomittant analgesic use is also likely to play a role. 
+As chronic pain is more prevalent with aging [@Schofield2007], it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen responding.
 
 
 
@@ -45,80 +46,122 @@ These concerns are relevant when a population lives with a cognition-affecting c
 
 # Method
 
-The study followed the PRISMA guidelines for reporting SRs and MAs [@Moher2009].
-
- The protocol of the study was registered with the International Prospective Register of Systematic Reviews (PROSPERO) [registration number: CRD 42021272835] and published elsewhere (EG ZZZZ Martín-Gómez et al.,
-2020).
+The study followed the PRISMA guidelines for reporting SRs and MAs [@Moher2009].  The protocol of the study was registered with the International Prospective Register of Systematic Reviews (PROSPERO) [registration number: CRD 42021272835] and published elsewhere [NB how do I report something housed on osf?].
 
 ## Search strategy
 
-Searches were conducted through the bibliographic databases Embase (1947-present), Medline (1946-present), and PsychInfo, as a mapping of articles identified in preliminary searches showed saturation by the use of these databases. OpenGrey (System for Information on Grey Literature in Europe) was additionally searched ??? Currently down.
+Searches were conducted through the bibliographic databases Embase (1947-present), Medline (1946-present), and PsychInfo, as a mapping of articles identified in preliminary searches showed saturation by the use of these databases. OpenGrey (System for Information on Grey Literature in Europe): [Last time I looked, this was down; I did some searches last year and couldn't find anything there]. 
+PROSPERO and Epistimonikos were searched for similar ongoing or recently completed SRs.
 
-
-The search was performed using the PICO model. It used medical headings and keywords associated with pain and cognitive screening instruments.Searches were initially piloted in PsychInfo before adaptation for use in the other databases. The search strategy for each database can be found in Appendix XXXX. PROSPERO and Epistimonikos were searched for similar ongoing or recently completed SRs.
-
-
+The search was performed using the PICO model. It used medical headings and keywords associated with pain and cognitive screening instruments. Searches were initially piloted in PsychInfo before adaptation for use in the other databases. The search strategy for each database can be found in Appendix XXXX. One article discovered at pre-search was unable to be captured by the search strategy and was added to the final included papers along with another article referenced as relevant within another.
 
 ## Eligibility criteria
 
-The review focused on primary research that involved a participant group experiencing chronic pain and a control group without that experience. 
-Studies had to include participants completion of a cognitive screen. Definitions of cognitive screen are varied and the subject of a number of previous systematic reviews [eg @Ashford2008, @Cullen2007], and the decision was made to utilise a practitioner definition provided in @AlzheimersSociety2013 which reports nine screens agreed by UK clinicians to be the focus of common clinical practice. Studies using different editions and language variants of these screens were also eligible. 
+The review focused on primary research that involved a participant group experiencing chronic pain and a control group without that experience. Studies had to include participants completion of a cognitive screen. Definitions of cognitive screen are varied and the subject of a number of previous systematic reviews [eg @Ashford2008, @Cullen2007], and the decision was made to utilise a practitioner definition provided in @AlzheimersSociety2013 which reports nine screens agreed by UK clinicians to be the focus of common clinical practice. Studies using different editions and language variants of these screens were also eligible. 
 
-Study design was not strictly defined, and could include cross-sectional designs as well as experimental designs including those introducing treatment such as medication, as long as cognitive screening information was available for both groups, and reporting was not clearly confounded by the impact of the treatment. This was rarely the case as screen information tended to be collected at baseline for these studies. 
+Study design was not strictly defined and could include cross-sectional designs as well as experimental designs including those introducing treatment such as medication, unless the available screening data was confounded by the treatment. Presence of a control group who were not experiencing chronic pain was a key eligibility criteria.
 
 ## Study selection
-After acquiring search results and removal of duplicates, two initial co-review stages were taken by reviewers 1 (AF) and 2 (JM): firstly to calibrate the eligibility checklist on 10 results and agree refinements, and then to independently screen 120 titles and abstracts against inclusion criteria, and then discuss discrepancies in judgment until reaching consensus on all cases, consulting with a third author where necessary.
+After acquiring search results and removal of duplicates, two initial co-review stages were taken by reviewers 1 (AF) and 2 (JM): firstly to calibrate the eligibility checklist on 10 results and agree refinements, and then to independently screen 120 titles and abstracts against inclusion criteria, and finally to discuss discrepancies in judgment until reaching consensus on all cases, consulting with a third author where necessary. Following this step the full texts of retained studies were reviewed starting with an eligibility calibration on 2 papers, followed by independent screening of 20 further full texts by the same two reviewers, addressing discrepancies in a similar manner. AF completed the full text review on all remaining results. Authors were contacted when full articles are unavailable (n=1).
 
-Following this step the full texts of retained studies were reviewed starting with an eligibility calibration on 2 papers, followed by independent screening of 20 further full texts by the same two reviewers, addressing discrepancies in a similar manner. Reviewer 1 then completed the full text review on all remaining results. Authors were contacted when full articles are unavailable (n=1).
+![Fig X Overview of selection process](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/exclusions.jpg)
 
 ## Data extraction
 
-Relevant data included type of pain condition, participant details,  measures of pain and mood and scores on the cognitive screening test, as well as whether the test was key or incidental to the study (e.g. a baseline measure). The cognitive screen data extracted was in the form of reported means and standard deviations; where data was presented in the form of median and inter-quartile range, this was converted into estimated mean and standard deviation using the estmeansd r package using the Box–Cox method described in @McGrath2020.
-
-Data was extracted by A.F, with J.M performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after 8 papers.
+Relevant data included type of pain condition, participant details,  measures of pain and mood and scores on the cognitive screening test, as well as whether the test was key or incidental to the study (e.g. a baseline measure). The cognitive screen data extracted was in the form of reported means and standard deviations; where data was presented in the form of median and inter-quartile range, this was converted into estimated mean and standard deviation using the estmeansd r package using the Box–Cox method described in @McGrath2020. Data was extracted by A.F, with J.M performing a check to ensure accurate extraction on 5 consecutive papers, which was achieved after 8 papers. Authors were contacted when data was partially incomplete (e.g. means but no standard deviations) and in one case due to a suspected error in the presented data.
 
 ## Statistical analyses
 
 Cognitive screen means and standard deviations were used to compute standardised mean differences in the form of Hedge's g using the approach described by @Hedges1985. Scores reflect the size of effect for membership of the chronic pain group versus control with a larger score reflecting greater impairment in the chronic pain group.
 
-A number of studies reported more than one comparison of cognitive screen scores that fit the review criteria due to multiple chronic pain groups compared to one or multiple control groups or two cognitive screens administered across participants.  In most instances this led to generating multiple standard mean differences per study, leading to interdependency between outcomes. This was addressed by introducing to the model a  covariance matrix estimating these interdependencies, including information about the relationships between cognitive screen scores. In one case, it was judged that groups could be more appropriately merged to produce a single standardised mean difference. 
-This is described in appendix XXXXX.
+A number of studies reported more than one comparison of cognitive screen scores that fit the review criteria due to multiple chronic pain groups compared to one or multiple control groups or two cognitive screens administered across participants.  In most instances this led to generating multiple standard mean differences per study, leading to interdependency between outcomes. This was addressed by introducing to the model a  covariance matrix estimating these interdependencies, including information about the relationships between cognitive screen scores. In one case, it was judged that groups could be more appropriately merged to produce a single standardised mean difference. Fuller details can be found in appendix XXXXX.
 
-The metafor package and 
-[@Viechtbauer2010]
+Analysis was conducted using the metafor package [@Viechtbauer2010]. In order to examine potential sources of variance between studies, a meta-regression approach was used to estimate the influence of potential moderators on the overall effect size. These were cognitive screen, chronic pain classification, age and disease duration.
 
-In order to examine potential sources of variance between studies, a meta-regression approach was used to estimate the influence of potential moderators on the overall effect size. These were cognitive screen, chronic pain classification, age and disease duration.
-
-
-## Risk of bias 
- <!-- this is not found in every one  -->
-
-## Assessment of publication bias ??
-
-
-Maybe only for those for which screening was key to the study
-
-## Data analysis
 
 ## Quality of evidence / Quality assessment tool
 
-Study quality was assessed using the JBI Critical Appraisal Checklist for Analytical Cross Sectional Studies (REF). This scale rates studies on eight criteria such as inclusion criteria, description of study, outcome measurement and strategies to deal with confounding factors. The checklist includes items that required some translation to relevance for this review, which was supplied to both reviewers as supplementary guidance that can be found in appendix.
-
-
-
+Study quality was assessed using the JBI Critical Appraisal Checklist for Analytical Cross Sectional Studies (REF). This scale rates studies on criteria such as inclusion criteria, description of study, outcome measurement and strategies to deal with confounding factors. The checklist includes items that required some translation to relevance for this review, which was supplied to both reviewers as supplementary guidance that can be found in appendix XXXY. Of the eight criteria, one (item 4) was judged to have no non-redundant role in reviewing the studies extracted, and was not included in the quality assessment.
 
 
 # Results
 
 
-## Study selection
+## Study characteristics
 
-``` {r, echo = F}
+
+
+``` {r, info, echo = F}
+# number of screens
+su_scr <- dfm_mod %>%
+  group_by(cognitive_name)%>%
+  count()
+
+numbs <- ((su_scr[1:5,2])) # still a weird object so use [[]] to subset
+
+names <- levels(dfm_mod$cognitive_name)
+
+```
+
+
+
+
+The search process led to the extraction of `r length(unique(dfm2$unique_id))` effect size estimates from `r length(unique(dfm2$study_id))` studies. Data from `r sum(dfm2$n_treat)` people experiencing chronic pain and `r sum(dfm2$n_cont) ` pain-free controls was extracted. Diagnoses are summarised in the table below. There were `r numbs[[1,1]]` comparisons involving the `r names[1]`, `r numbs[[2,1]] ` for the `r names[2]`, `r numbs[[3,1]]` for the `r names[3]`, `r numbs[[4,1]]` for the `r names[4]`, and `r numbs[[5,1]]` for the `r names[5]`. In `r sum(dfm_mod$cognitive_focus=="key")` comparisons, the screen was critical to the study focus and `r sum(dfm_mod$cognitive_focus=="incidental")` where the screen was used merely to inform the description of samples.
+
+```{r}
+cond_tab <- dfm2 %>%
+  group_by(sample_treat_cat, sample_treat) %>%
+  summarise(
+            count = n()
+                        )
+
+
+
+wide_conds <-cond_tab %>%
+pivot_wider( names_from = sample_treat_cat,
+                             values_from = count)
+
+try <- wide_conds %>%
+  mutate(across(everything(), ~ ifelse(!is.na(.), paste0(sample_treat," (", ., ")"
+                                                        ),""))) %>%
+  select(!sample_treat)
+
+
+flextable(try)
+```
+[*note in the MSK column there is one study that states 1 month only... this is a study which repeatedly refers to chronic pain including in its title, participant descriptions etc. It centres on musculoskeletal pain (ie rather than healing injuries). However its minimum length of pain is 1 month or more for most days, which differs from the criteria I rely on elsewhere. Hence I have included it for now but wonder whether it may need removal. However, note also the next point:*]
+```{r, minimum_m}
+levs = c("1","2","3","6","12","24","Not reported")
+minimum_onset <- dfm_mod %>%
+  mutate(minimum_months = ifelse(is.na(pain_onset_min), "Not reported", pain_onset_min),
+         minimum_months = factor(minimum_months, labels  = levs) )%>%
+        # ) %>%
+  group_by(minimum_months) %>%
+  summarise(n(),
+            average_years = sum(!is.na(pain_duration_mean))) 
+
+mintab <- flextable(minimum_onset)
+
+set_header_labels(mintab, 
+                  minimum_months = "min pain duration (months)",
+                                    `n()` = "n",
+                                    average_years = "instances where mean pain duration reported"
+                  )
+
+
+
+```
+
+[*This table shows how `r sum(is.na(dfm_mod$pain_onset_min))` of comparisons did not provide an indication of minimum duration, either explicitly or via reference to a diagnosis that includes a minimum duration, and only a minority of these reported a mean duration of pain. For instance, rheumatoid arthritis is considered a chronic pain condition but the diagnostic criteria do not require a minimum period before a diagnosis is given]
+
+``` {r, overviewtab, echo = F}
+
 library("flextable")
 library("ftExtra")
 library("dplyr")
 library("officer")
-library(openxlsx)
+library("openxlsx")
+library("ggpubr")
 
 set_flextable_defaults(
   font.size = 10, theme_fun = theme_vanilla,
@@ -159,10 +202,11 @@ tab1 <- set_table_properties(tab1, layout = "autofit")
 set_header_labels(tab1, 
                   biblio_comp = "Authors", 
                   sample_treat = "Pain group",
+                  matching_education = "Education",
                   n_treat = "Patient group size",
                   n_cont = "Control group size",
                   cognitive_name = "Screen",
-                  age_sum_treat = "Patient age; mean (sd)")
+                  age_sum_treat = "Patient age")
                   
 
 # put this outside the block to work <!---BLOCK_LANDSCAPE_START---> <!---BLOCK_LANDSCAPE_STOP--->
@@ -174,22 +218,6 @@ set_header_labels(tab1,
 
 
 
-## Study characteristics
-
-There were `r sum(dfm_mod$cognitive_focus=="key")` comparisons where the screen was critical to the study focus and `r sum(dfm_mod$cognitive_focus=="incidental")` where the screen was used incidentally.
-
-## Participants 
-<!-- this is not found in every one  -->
-
-NEED A 
-
-
-## Type of screen
-<!-- this is not found in every one  -->
-
-## Risk of bias of the included studies
-
-The evaluation of confounders reported above does not include mood or anxiety. These two features are considered prevalent and co-occurring symptoms with pain, forming part of a symptom cluster [@Davis2016] together. Accordingly, mood was significantly higher for the pain group in ` R CODE ` of the studies, with `R CODE` not reporting mood and only ` x` explicitly matching. Anxiety was rated in only `R CODE` of the studies and was significantly different in `R CODE`.
 
 ## Impact of chronic pain upon cognitive screen performance
 
@@ -207,11 +235,11 @@ dfm_mod %>%
 ```
 
 
-The average standard mean difference derived from the model was `r format(round(study_outputs$pred, 2), nsmall = 2)` with the 95% confidence interval ranging from `r format(round(study_outputs$ci.lb, 2), nsmall = 2)` to `r format(round(study_outputs$ci.ub, 2), nsmall = 2)`.
+The average standard mean difference derived from the model was `r format(round(study_outputs$pred, 2), nsmall = 2)` with the 95% confidence interval ranging from `r format(round(study_outputs$ci.lb, 2), nsmall = 2)` to `r format(round(study_outputs$ci.ub, 2), nsmall = 2)`. This describes the range within which we expect the average effect size to fall (based on our dataset). The 95% prediction interval describes the range we might expect the true effect size to be in each of our studies, and this ranged from `r format(round(study_outputs$pi.lb, 2), nsmall = 2)` to `r format(round(study_outputs$pi.ub, 2), nsmall = 2)`, suggesting that the group difference should not be expected to exist across every study.
 
 Analysis suggested that the true effects were heterogeneous (Q = `r round(che.model_N$QE,2)`, p < 0.0001). This was chiefly due to differences in true effects of studies (`r round(che.model_N$sigma2[1],2)`) with small levels of within-study heterogeneity (`r round(che.model_N$sigma2[2],2)`).
 
-
+## Robustness of results
 
 ```{r, violins, echo=F}
 ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
@@ -219,13 +247,13 @@ ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
   theme(axis.title.x = element_blank()) + ylab("effect size")
 ```
 
-
+The above echoes the standardised residuals which were above 2 for the three highest comparisons. [*NB: decision to be made here. These are 3 comparisons from 2 studies. One was with a Lupus group who were not screened to exclude neuropsychiatric complications, their raw score mean difference was massive, 28 control vs 15 pain; the other two were from a study with very small S.D.s (eg 0 forcontrol, less than 1 for pain groups) which has led to very large scores. Is there a case for removing them? I also note that this lupus study is also included in the funnel plot later and does influence the results strongly, so consideration is worth whether to include it there or not. *]
 
 
 ``` {r, forester, echo = F}
 
-forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
-       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)  # the cbind.data.frame is to stop factor returning as integers
+# forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+#       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)  # the cbind.data.frame is to stop factor returning as integers
 ```
 
 
@@ -233,19 +261,30 @@ forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE
 
 ``` {r, forester2, echo = F}
 
-forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
-       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = "obs")  # the cbind.data.frame is to stop factor returning as integers
+#forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+#       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = "obs")  # the cbind.data.frame is to stop factor returning as integers
 ```
 
-``` {r, forester2, echo = F}
-
-che.model_N_small <- che.model_N
-
-che.model_N_small$vi.f <- che.model_N_small$vi.f[1:25]
+``` {r, forester_mmse, echo = F}
 
 
-forest(che.model_N_small, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
-       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)
+mmse_f <- as.ggplot(~forest(che.model_mmse, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, 
+       showweights=FALSE, header=TRUE, xlim=c(-8,9),  order = author_final, main="MMSE"))
+# ====
+
+screens_f <- as.ggplot(~forest(che.model_screens, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, 
+       showweights=FALSE, header=TRUE,  order = cognitive_name,  ilab = cbind.data.frame(cognitive_name), ilab.xpos = -2, xlim=c(-6,9), ilab.pos = 4, main="Other screens"))
+
+
+
+      
+
+ 
+together <- mmse_f / screens_f
+
+
+
+# https://stackoverflow.com/questions/23898912/metafor-including-data-in-forest-plot-but-not-meta-analysis-model?rq=1
 
 ```
 
@@ -253,6 +292,7 @@ forest(che.model_N_small, slab=author_final, annotate=TRUE, addfit=TRUE, addpred
 
 ## Publication bias
 
+[*NB I have completed these twice. In the first I have left in the the study with a large effect (see discussion above) and in the second removed it*]
 
 ``` {r, funnelling, echo = F}
  dfm_key<- dfm_mod %>%
@@ -271,16 +311,78 @@ funnel(res_tri_out, legend= TRUE, main = "Funnel Plot (focused studies) - no out
 
 ```
 
-## Subgroup analysis, meta-regression and stratified meta-analysis
+The trim-and-fill analysis presented in the funnel plot suggests that the effects expected but not seen would be above the average; in particular more high-powered studies with large effects would be expected. [*NB need to address study heterogeneity?*]
 
-## Confounds
+## Subgroup analysis, meta-regression and stratified meta-analysis
+```{r, painstuff}
+pain_treats <- dfm_mod %>%
+filter(pain_measured_treat=="yes") %>%
+  summarise(n())
+pain_conts <- dfm_mod %>%
+  filter(pain_measured_cont=="yes") %>%
+  summarise(n())
+```
+
+Although pain intensity summary data were published for pain group for  `r pain_treats[[1]]` comparisons, control data was only supplied in `r pain_conts[[1]]` instances. Within the subset for which data was available standardised mean differences for pain intensity were computed and the relationship between the two are plotted below. 
+
+``` {r, multismd_checks, echo = F}
+
+# pain diffs
+multismd  %>%
+  ggplot(mapping = aes(x=yi_pain, y=yi_cog)) + geom_point() + stat_smooth(method=lm)
+```
+
+Running a smaller model with pain standardised mean differences as a moderator of the effect found a significant relationship between greater pain in the pain group and the size of the average effect: \beta = `r round(che.model_pain$beta[2],3)`, se = `r round(che.model_pain$se[2],3)`, p = `r round(che.model_pain$pval[2],4)`.
+
+Using patient age as as a moderator of the effect found a significant relationship where younger pain experiencing patients were likely to show a larger effect: \beta = `r round(che.model_age$beta[2],3)`, se = `r round(che.model_age$se[2],3)`, p = `r round(che.model_age$pval[2],3)`. [*NB this is influenced again by the fact the "big 3" studies were all for ages below 45. When removed, the effects remain but are attenuated....*]
+
+``` {r, age_rels}
+# age diffs
+#multismd  %>%
+#  ggplot(mapping = aes(x=yi_age, y=yi_cog)) + geom_point() + stat_smooth(method=lm)
+
+# age patients
+multismd  %>%
+  ggplot(mapping = aes(x=age_mean_treat, y=yi_cog)) + geom_point() + stat_smooth(method=lm)
+```
+
+``` {r, tempy}
+# just using rough z-scoresy for all available pain group pain scores
+#dfm_mod %>%
+#  ggplot(mapping = aes(x=pain_mean_treat/pain_sd_treat, y=yi)) + geom_point() + stat_smooth(method=lm)
+```
+
 
 
 
 ## Quality of evidence
 
 
-<!-- ============================  -->
+
+
+![Fig X. Quality plot - MMSE](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/qual_plot_mmse.png)
+[*Not sure why the big white space gap has appeared here - will fix*]
+
+[*I want to note that Li et al is a huge study (see n above) with no real exclusion criteria, older patients, and education/medication unreported. So this one currently stands out to me as maybe benefiting from removing from analysis..*]
+
+![Fig X. Quality plot - other screens](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/qual_plot_other_screens.png)
+```{r moodsum}
+
+mooddiffs <- qualityset %>%
+  group_by(q6_mood_confound) %>%
+ count()
+
+mooddiffs_x <- mooddiffs[1:4,2]
+
+```
+
+
+
+
+
+
+The evaluation of confounders reported in item 6 does not include mood, which is a considered prevalent and co-occurring symptom with pain, forming part of a symptom cluster [@Davis2016]. Accordingly, mood was significantly higher for the pain group in `r mooddiffs_x[[2,1]]` of the studies, with `r mooddiffs_x[[3,1]] +  mooddiffs_x[[4,1]]` not reporting mood and only `r mooddiffs_x[[1,1]]` reporting similar levels of mood. 
+
 
 # Discussion
 <!-- some do not break down this way -->
@@ -289,22 +391,35 @@ funnel(res_tri_out, legend= TRUE, main = "Funnel Plot (focused studies) - no out
 
 ## Comparison with previous research
 
+
+
+Chronic pain spans a number of conditions, each of which makes its own contributions to 
+
+
+Other research has reported patients with fibromyalgia to have higher prevalence of cognitive deficit based on screen performance compared to other forms of pain [e.g. neuropathic or mixed pain, @RodriguezAndreu2009] although score ranges do not differ drastically.
+
+Inflammatory diseases are increasingly understood to have neurological implications, meaning that patients whose chronic pain stems from these diseases may score differently on chronic screens because of pain and the direct action of the disease. There is evidence, for instance, that patients with rheumatoid arthritis attain poorer MoCA scores than controls with similar levels of bodily pain [@Kim2018].
+
+
+@Chen2011 reported that patients with self-reported musculoskeletal chronic pain who scored in the upper quartile on the Brief Pain Inventory Severity Scale were twice as likely as those in the lower quartile to obtain an MMSE score below 24 (18.5% versus 9.7%). However, @Bosley2004 found no difference in MMSE scores between groups with significantly different pain intensity scores (MPQ-SF).
+
+
+In terms of change over time, reduction in chronic pain levels was associated with improvement in MoCA performance in @Bernardi2021[, however note a small sample], but not in @Alemanno2019, despite improvements observed on some other neuropsychological measures.
+
+The low levels of like-for-like pain measures obtained make this difficult to assess directly here.
+
+
+
+
 ## Meaning and implications
+
+[*NB I would like to report back actual effect sizes in a practical way, eg MMSE real score differences. But not sure whether I should be taking the average standardised effect size discovered and translating that back  into a score, or doing a calc with eg MMSE studies to find the (unstandardised) mean difference there. Thoughts?*]
 
 ## Strengths and limitations
 
+The absence of studies that were well
+
+
 ## Future research
 
- 
-
-
-
-## Patient data
-
-
-
-
-# Results
-
-
-
+# References

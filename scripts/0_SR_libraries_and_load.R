@@ -13,6 +13,11 @@ library("clubSandwich")
 library(esc)
 library(naniar)
 library(forestplot)
+library(patchwork)
+library(ggplotify)
+library("flextable")
+library("ftExtra")
+library(stringr)
 
 
 # ==================
@@ -69,7 +74,7 @@ dfm2 <- dfm2 %>%
 repeats <- dfm2 %>%
   group_by(study_id)%>%
   filter(n()>1) %>%
-  select(study_id,unique_id, study_num, sample_cont,sample_treat,cognitive_name)
+  select(study_id,unique_id, author_final, comp, sample_cont,sample_treat,cognitive_name)
 
 
 
