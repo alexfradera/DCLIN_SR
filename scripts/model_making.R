@@ -4,15 +4,24 @@ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\D
 
 # ===============================
 # Models
+# ===============================
 
-# simple random-effects model
+
+# ===============================
+# 1 simple random-effects model (no accounting for non-independence)
 simple <- rma(yi, vi, data=dfm_mod)
 simple
 
+# with HSK
+simple2 <- rma(yi, vi, data=dfm_mod, method = "HSk")
+simple2
+
 forest(simple, slab = dfm_mod$author_final)
 
+
+
 # ====================================================
-# Preparing data for CHE model
+# 2 Preparing data for CHE model
 
 # # constant sampling correlation assumption
 # rho <- 0.6 # initial guess
@@ -49,10 +58,12 @@ cov2cor(V[dfm_mod$study_num == 89, dfm_mod$study_num == 89])
 cov2cor(V[dfm_mod$study_num == 121, dfm_mod$study_num == 121]) # MMSE and MOCA
 cov2cor(V[dfm_mod$study_num == 134, dfm_mod$study_num == 134]) # MMSE and TYM for part of it
 cov2cor(V[dfm_mod$study_num == 182, dfm_mod$study_num == 182]) # MMSE and MOCA
+cov2cor(V[dfm_mod$study_num == 993, dfm_mod$study_num == 993]) # MMSE and MOCA
+cov2cor(V[dfm_mod$study_num == 994, dfm_mod$study_num == 994]) # MMSE 2 groups
 
 
-
-# Raw CHE model:
+# 3. start running Correlated and Hierarchical Effects models:
+# 3a Raw CHE model:
 
 che.model <- rma.mv(yi ~ 1,
                     V = V,
@@ -63,7 +74,8 @@ che.model <- rma.mv(yi ~ 1,
 conf_int(che.model, 
          vcov = "CR2")
 
-# CHE model using grand N
+# 3b CHE model using values computed using grand N
+# The function computes predicted values, corresponding standard errors, confidence intervals, and prediction intervals 
 
 che.model_N <- rma.mv(yiN ~ 1,
                     V = V,
@@ -71,17 +83,32 @@ che.model_N <- rma.mv(yiN ~ 1,
                     data = dfm_mod,
                     sparse = TRUE)
 
-# The function computes predicted values, corresponding standard errors, confidence intervals, and prediction intervals 
+
 # This produces the key outcomes.
 study_outputs <- predict(che.model_N, digits=2)
 
 
-
-# use robust inference methods based on this model
-robust(che.model_N, cluster=study_id, clubSandwich=TRUE)
-
 # check residuals
-rstudent(che.model_N)
+resids_cheN <- as.tibble(rstudent(che.model_N)$resid)
+ggplot(data = resids_cheN, mapping = aes(x=1, y=value)) + geom_violin() +
+  scale_x_continuous(breaks=NULL) +
+  theme(axis.title.x = element_blank()) + ylab("residuals - CHE")
+
+
+# 4 use CHE model with robust inference methods
+
+
+sav <- robust(che.model_N, cluster=study_id, clubSandwich=TRUE)
+resids_sav <- as.tibble(residuals(sav))
+ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
+  scale_x_continuous(breaks=NULL) +
+  theme(axis.title.x = element_blank()) + ylab("residuals - Sandwich")
+
+
+
+
+
+
 
 # ============================================================
 
@@ -90,8 +117,10 @@ rstudent(che.model_N)
 multismd <- dfm_mod %>%
   # filter(pain_measured_cont=="yes") %>%
   mutate(yi_cog = yi,
-         vi_cog = vi) %>%
-  select(!c(yi,vi))
+         vi_cog = vi,
+         yi_cogN = yiN,
+         vi_cogN = viN) %>%
+  select(!c(yi,vi,yiN,viN))
 
 multismd  <- escalc(measure="SMD",
                     n1i = n_cont,

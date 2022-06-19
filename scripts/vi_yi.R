@@ -9,11 +9,11 @@ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\D
 
 
 # ====================
-# creating Hedge's g effect sizes for each model SDM with SE. 
+# 1. "traditional route"
+# Creating Hedge's g effect sizes for each model SDM with SE. 
 
-# !!! AMEND VERSION OF DFM
 
-# create effect sizes (Hedge's g) and standard error - $es and $se
+# 1a create effect sizes (Hedge's g) and standard error - $es and $se
 dfm_e1 <- dfm_e %>%
   mutate(es =  esc_mean_sd(grp1m = cognitive_mean_cont,   # mean of group 1
                            grp1sd = cognitive_sd_cont,  # standard error of group 1
@@ -31,7 +31,9 @@ dfm_e1 <- dfm_e %>%
                           es.type = "g")$se
   )
 
-# create effect sizes (SMD) and sampling variance - $yi and $vi
+# 1b create effect sizes (SMD), this time with sampling variance instead of se - $yi and $vi
+# uses metafor escalc() function
+
 dfm_e2 <-  escalc(measure="SMD",
                      n1i = n_cont,
                      m1i = cognitive_mean_cont, 
@@ -43,7 +45,11 @@ dfm_e2 <-  escalc(measure="SMD",
                      vtype="AV") # this incorporates sample-size weighted average of Hedges'g values.
 
 
-# create effect sizes (SMD)
+####################################
+#2  create effect sizes (SMD) using 'grand N'
+
+
+
 dfm_e3 <- arrange(dfm_e2,study_num)
 
 dfm_e3$Ni <- unlist(
@@ -61,7 +67,10 @@ dfm_e3 <- dfm_e3 %>%
     viN = 1/n_cont+ 1/n_treat + yi^2/(2*Ni)
   )
 
-select(dfm_e3,study_id, comp,n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat, sdpi, es,yi, yiN, se, vi,viN)   
+
+################### compare effect sizes
+# select(dfm_e3,study_id, comp,n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat, sdpi, es,yi, yiN, se, vi,viN)   
+
 
 # We can see that es, yi, and yiN are similar (but not identical)
 # vi and viN are similar (but not identical) and vary from se (ok, as they are different measures)
@@ -83,6 +92,3 @@ dfm_mod %>%
 outliers <- dfm_mod %>%
   filter(yi > 2) %>%
   select(1:25,yi,cognitive_mean_cont,cognitive_sd_cont, cognitive_mean_treat,cognitive_sd_treat)
-
-#These were cognitive screen, chronic pain classification, age and disease duration.
-

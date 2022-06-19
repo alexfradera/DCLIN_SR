@@ -1,4 +1,34 @@
+---
+title: "Systematic Review"
+author: "2509920F"
+date: "`sa"
+output: 
+  officedown::rdocx_document:
+     reference_docx: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_Template.docx'
+     tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      caption:
+       style: Table Caption
+       pre: 'Table '
+       sep: ': '
+      conditional:
+       first_row: true
+       first_column: false
+       last_row: false
+       last_column: false
+       no_hband: false
+       no_vband: true
+bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_biblio.bib'
+csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
+---
 
+
+
+```{r include=FALSE}
+library(officedown)
+```
 
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
@@ -31,14 +61,24 @@ require("knitr")
 # Introduction
 
 
-Cognitive screening tools are measures designed to detect cognitive impairment through brief means. These either target one highly predictive ability or are addressed at a set of core domains (language, memory, orientation) using a minimal set of items for each. Measures considered cognitive screens are typically those that can be completed within 20 minutes [@Cullen2007] and are not an alternative to fuller neuropsychological test batteries, which are more comprehensive and sensitive. Cognitive screening occurs in a wide variety of contexts such as patients with brain tumours, psychiatric disorders, or traumatic brain injuries [@RoebuckSpencer2017]; however screening for dementia is a rationale behind the construction of many . 
+Cognitive screening tools are measures designed to detect cognitive impairment through brief means. These either target one highly predictive ability or are addressed at a set of core domains (language, memory, attention) using a minimal set of items for each. Measures considered cognitive screens are typically those that can be completed within 20 minutes [@Cullen2007] and are not an alternative to fuller neuropsychological test batteries, which are more comprehensive. Cognitive screening occurs in a wide variety of contexts such as patients with brain tumours, psychiatric disorders, or traumatic brain injuries [@RoebuckSpencer2017]; however screening for dementia is a rationale behind the construction of many. 
 
 Cognitive screens are not intended to be diagnostic, although low scores that corroborate clear deficits found in a clinical examination and interview may be considered sufficient without further cognitive investigation. Outside of this context, cognitive screen performance contributes to the decision whether more investigation is required. Key here is that cognitive screens are sufficiently sensitive - correctly identifying when followup is warranted, to maximise early diagnosis - and specific - avoiding putting people on an investigative pathway when this is not necessary [@Cullen2007].
 
+Key to this diagnostic accuracy is awareness of how other factors may influence screen performance. For instance, while the screening measure Addenbrooke's Cognitive Examination-III (ACE-III) appears reasonably robust to levels of premorbid intelligence of the test-taker [@Stott2017], other frequently used screens such as the Mini-Mental Scale Examination (MMSE) and Montreal Cognitive Assessment (MoCA) show an influence of intelligence [@Alves2013], leading those researchers to recommend premorbid IQ scores be considered alongside the results of these tests.
 
-These concerns are relevant when a population lives with a cognition-affecting condition that is not the disease being screened for, such as experiencing chronic pain. People living with chronic pain are more likely to report problems with memory, attention or thinking [@McCracken2001]. Pain is known to affect performance on neuropsychological cognitive tests and batteries, some of which are summarised by @Moriarty2011, and include deficits in domains such as attention, information processing and executive function. Potential mechanisms for this include depletion of resources, distracting effects of pain symptoms disrupting attention, and in the case of chronic pain possible longer-term changes to the nervous system either due to sustained pain or the condition that produces it. Concomittant analgesic use is also likely to play a role. 
-As chronic pain is more prevalent with aging [@Schofield2007], it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen responding.
+These concerns are also  relevant when a population may have comorbid conditions that also affect cognition, such as chronic pain. When someone experiences chronic pain they are more likely to report problems with memory, attention or thinking [@McCracken2001]. Pain is known to affect performance on neuropsychological cognitive tests and batteries, some of which are summarised by @Moriarty2011, and include deficits in domains such as attention, speed of information processing and executive function. Potential mechanisms for this include depletion of resources, distracting effects of pain symptoms disrupting attention, and in the case of chronic pain possible longer-term changes to the nervous system either due to sustained pain or the condition that produces it. Concomittant analgesic use is also likely to play a role. 
+As chronic pain is more prevalent with aging [@Schofield2007], it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen performance.
 
+
+Existing reviews have established the impact of chronic pain on aspects of cognition. A literature review in ???????? suggests a particular impacsee also on working memory and long-term memory recall.  Meta-analyses for working memory measures are described in  @Berryman2013 and for executive function measures in @Berryman2014. 
+
+For rheumatoid arthritis specifically, @Pankowski2022 present meta-analyses showing cognitive impairment based on several measures, and  @Meade2018 note impairments particularly in memory, attention and verbal function were found to be impaired. A review of fibromyalgia by @SchmidtWilcke2010 summarises problems in free recall, working memory and a mixed pattern of results around attention. 
+
+In the main these studies do not focus on cognitive screening tools. The primary exception is @Pankowski2022 which reports estimated effect sizes for two such measures, the Mini-Mental State Inventory (based on eight comparisons) and the Montreal Cognitive Assessment (based on three comparisons), finding respective Standardised Mean Differences of .66 [95% CI 0.42- 0.9] and 1.27 [95% CI .68-1.87]. This is suggestive that pain conditions may be associated with poorer cognitive screen performance. However, this may not generalise to other conditions, especially as other mechanisms for cognitive impairment are suspected for rheumatoid arthritis. [CITE] 
+
+
+ This is pertinent as  executive function is not measured in a number of screens
 
 
 
@@ -131,7 +171,7 @@ flextable(try)
 ```
 [*note in the MSK column there is one study that states 1 month only... this is a study which repeatedly refers to chronic pain including in its title, participant descriptions etc. It centres on musculoskeletal pain (ie rather than healing injuries). However its minimum length of pain is 1 month or more for most days, which differs from the criteria I rely on elsewhere. Hence I have included it for now but wonder whether it may need removal. However, note also the next point:*]
 ```{r, minimum_m}
-levs = c("1","2","3","6","12","24","Not reported")
+levs = c("3","6","12","24","Not reported")
 minimum_onset <- dfm_mod %>%
   mutate(minimum_months = ifelse(is.na(pain_onset_min), "Not reported", pain_onset_min),
          minimum_months = factor(minimum_months, labels  = levs) )%>%
@@ -145,7 +185,7 @@ mintab <- flextable(minimum_onset)
 set_header_labels(mintab, 
                   minimum_months = "min pain duration (months)",
                                     `n()` = "n",
-                                    average_years = "instances where mean pain duration reported"
+                                    average_years = "n where mean condition/pain duration reported"
                   )
 
 
@@ -173,7 +213,7 @@ overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasg
 overview <- overview %>%
   mutate(biblio_comp = paste0("@",biblio))
 
-pres_overview <- select(overview, study_id, biblio_comp)
+pres_overview <- select(overview, study_id, biblio_comp, country)
 
 pres_dat <- dfm_e %>%
   select(study_id, sample_treat, n_treat, age_mean_treat, age_sd_treat,  n_cont, matching_education, cognitive_name )
@@ -181,7 +221,7 @@ pres_dat <- dfm_e %>%
 test <- left_join(pres_dat,pres_overview, by="study_id")
 test <- test %>%
   arrange(biblio_comp) %>%
-  relocate(biblio_comp) %>%
+  relocate(biblio_comp, country) %>%
   select(!study_id)
 
 test <- test %>%
@@ -201,6 +241,7 @@ tab1 <- test %>%
 tab1 <- set_table_properties(tab1, layout = "autofit")
 set_header_labels(tab1, 
                   biblio_comp = "Authors", 
+                  country = "Country",
                   sample_treat = "Pain group",
                   matching_education = "Education",
                   n_treat = "Patient group size",
@@ -237,7 +278,7 @@ dfm_mod %>%
 
 The average standard mean difference derived from the model was `r format(round(study_outputs$pred, 2), nsmall = 2)` with the 95% confidence interval ranging from `r format(round(study_outputs$ci.lb, 2), nsmall = 2)` to `r format(round(study_outputs$ci.ub, 2), nsmall = 2)`. This describes the range within which we expect the average effect size to fall (based on our dataset). The 95% prediction interval describes the range we might expect the true effect size to be in each of our studies, and this ranged from `r format(round(study_outputs$pi.lb, 2), nsmall = 2)` to `r format(round(study_outputs$pi.ub, 2), nsmall = 2)`, suggesting that the group difference should not be expected to exist across every study.
 
-Analysis suggested that the true effects were heterogeneous (Q = `r round(che.model_N$QE,2)`, p < 0.0001). This was chiefly due to differences in true effects of studies (`r round(che.model_N$sigma2[1],2)`) with small levels of within-study heterogeneity (`r round(che.model_N$sigma2[2],2)`).
+Analysis suggested that the true effects were heterogeneous (Q = `r round(che.model_N$QE,2)`, p < 0.0001). This was chiefly due to differences in true effects of studies (`r round(che.model_N$sigma2[1],2)`) with small levels of within-study heterogeneity (`r round(che.model_N$sigma2[2],6)`).
 
 ## Robustness of results
 
@@ -247,13 +288,13 @@ ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
   theme(axis.title.x = element_blank()) + ylab("effect size")
 ```
 
-The above echoes the standardised residuals which were above 2 for the three highest comparisons. [*NB: decision to be made here. These are 3 comparisons from 2 studies. One was with a Lupus group who were not screened to exclude neuropsychiatric complications, their raw score mean difference was massive, 28 control vs 15 pain; the other two were from a study with very small S.D.s (eg 0 forcontrol, less than 1 for pain groups) which has led to very large scores. Is there a case for removing them? I also note that this lupus study is also included in the funnel plot later and does influence the results strongly, so consideration is worth whether to include it there or not. *]
+[*NB this additional plot may be redundant for final article*] The violin plot depicted here shows the majority of comparisons fall in a fairly narrow band as described above but there are a small proportion that sit well above the others. Note the  standardised residuals which were above 2 for these three highest comparisons. [*NB: decision to be made here. These are 3 comparisons from 2 studies. One was with a Lupus group who were not screened to exclude neuropsychiatric complications, their raw score mean difference was massive, 28 control vs 15 pain; the other two were from a study with very small S.D.s (eg 0 forcontrol, less than 1 for pain groups) which has led to very large scores. Is there a case for removing them? I also note that this lupus study is also included in the funnel plot later and does influence the results strongly, so consideration is worth whether to include it there or not. *]
 
 
 ``` {r, forester, echo = F}
 
-# forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
-#       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)  # the cbind.data.frame is to stop factor returning as integers
+ forest(che.model_N, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-2,5, by =1), xlim=c(-6,8),
+       showweights=FALSE, header=TRUE, ilab = cbind.data.frame(sample_treat_cat), ilab.xpos = -3, ilab.pos = 4, order = sample_treat_cat)  # the cbind.data.frame is to stop factor returning as integers
 ```
 
 
@@ -292,7 +333,8 @@ together <- mmse_f / screens_f
 
 ## Publication bias
 
-[*NB I have completed these twice. In the first I have left in the the study with a large effect (see discussion above) and in the second removed it*]
+
+Focusing only on studies where the cognitive screen was key to the study purpose, a funnel plot was produced using the trim-and-fill method to interpolate study effect sizes that would be expected from the extracted results.
 
 ``` {r, funnelling, echo = F}
  dfm_key<- dfm_mod %>%
@@ -303,11 +345,11 @@ res_tri <- trimfill(res_key)
 funnel(res_tri, legend= TRUE, main = "Funnel Plot (focused studies)")
 
 # what about without outlier?
-dfm_key_out <- filter(dfm_mod, yi <3)
+#dfm_key_out <- filter(dfm_mod, yi <3)
 
-res_key_out <- rma(yi, vi, data=dfm_key_out)
-res_tri_out <- trimfill(res_key_out)
-funnel(res_tri_out, legend= TRUE, main = "Funnel Plot (focused studies) - no outlier") 
+#res_key_out <- rma(yi, vi, data=dfm_key_out)
+#res_tri_out <- trimfill(res_key_out)
+#funnel(res_tri_out, legend= TRUE, main = "Funnel Plot (focused studies) - no outlier") 
 
 ```
 
@@ -352,7 +394,9 @@ multismd  %>%
 #  ggplot(mapping = aes(x=pain_mean_treat/pain_sd_treat, y=yi)) + geom_point() + stat_smooth(method=lm)
 ```
 
+In only `r mconf[[2,2]]` comparisons were medication both reported and controlled in some way, for instance asking patients to abstain from taking analgesics for the week prior to the study.
 
+I have other thoughts on this but 
 
 
 ## Quality of evidence
@@ -409,6 +453,10 @@ In terms of change over time, reduction in chronic pain levels was associated wi
 The low levels of like-for-like pain measures obtained make this difficult to assess directly here.
 
 
+A study on the influence of background noise on MoCA performance reported a three-point decrement to completing the measure under noisy conditions [@Dupuis2016]. Noise places demands "on a limited capacity of attention and information processing, leaving less capacity available to the task at hand" [@Boman2004,p.448] which aligns with one account of how pain impacts cognition.
+
+
+### Inflammatory illnesses
 
 
 ## Meaning and implications
@@ -417,8 +465,14 @@ The low levels of like-for-like pain measures obtained make this difficult to as
 
 ## Strengths and limitations
 
-The absence of studies that were well
+Pain reporting: one consideration when researching pain and cognitive ability is the risk that pain may be under-reported by people with cognitive impairment, introducing error into the findings. There is evidence that this is the case for people with a dementia diagnosis [reviewed by @Scherder2005]; however this study did not include this patient group or others with similar neuropsychological impairments. The research for the impact of cognition beyond these more marked cases of impairment does not suggest changes in pain perception or reporting that would be expected to impact these results [see e.g. @Kunz2009 and @Docking2014].
 
+The absence of studies that were well-controlled in terms of medication
+Commonly prescribed medication for rheumatoid arthritis have been associated with cognitive impairment [for methotrexate, @Pamuk2013; for glucocorticoid therapy, ]. 
+
+In terms of impact on cognitive screens, the MMSE does not appear to be influenced by opioidal medication [@Gogol2014a]  
+
+List of cognitive screens come from UK guidance - generalisability?
 
 ## Future research
 

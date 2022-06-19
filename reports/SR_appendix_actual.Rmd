@@ -24,6 +24,10 @@ bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin
 csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
 ---
 
+# Approach
+Approach: one main analysis (possibly do a simple version under the hood and the more complex model just to check not wildly off) with every study. This can include measure type as a moderator.Then a sensitivity version dropping studies that you have a rationale to drop. And then possibly a few more sub-analyses, eg only those with similar depression scores – but may prefer to just inspect the data – eg order the forest plot by variables (eg categorical y/n depression)
+
+
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 require("knitr")
@@ -37,7 +41,7 @@ require("knitr")
  # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
 
 
- source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid.R", echo = FALSE)
 
 
 # citation("metafor") etc
@@ -45,34 +49,35 @@ require("knitr")
 ```
 
 # Data checking
-```{r, mean_distro}
-dfm2 %>%
+```{r, mean_distro, echo = F}
+a1<- dfm2 %>%
   ggplot(mapping = aes(x=cognitive_mean_treat, fill = cognitive_name)) + geom_histogram(binwidth = 2, alpha = 0.4)  
+
+a2<- dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_sd_treat, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4) 
+
+a1/a2
+
 # , fill = "wheat", color = "black"
 ```
 
 
-```{r, sd_distro by screen}
-#dfm2 %>%
-#  group_by(cognitive_name) %>%
-#  summarize(mean = mean(cognitive_sd_treat))
-```
 
 
 
-```{r, sd_distro}
-dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_sd_treat, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4) 
-```
-```{r, control_mean}
-dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_mean_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .2, alpha = 0.4)  
+```{r, control_mean, echo = F}
+
+b1 <- dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_mean_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = 2, alpha = 0.4)  
+
+b2 <- dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_sd_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4)  
+
+b1/b2
+
 ```
  
-```{r, control_sd}
-dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_sd_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .2, alpha = 0.4)  
-```
+
 
 
 
@@ -91,11 +96,11 @@ simple
 
 The summary information for this model (effect, s.e, confidence and prediction intervals are) 
 
-```{r, simpleout}
+```{r, simpleout, echo = F}
 predict(simple, digits=2)
 ```
 
-
+NB. For these and other models I am feeding in the es and variance thereof into the model for each comparison and it does the rest of the work. I can't see any explicit requests to enter in the sample sizes 
 
 # Presence of multiple comparisons
 
@@ -115,7 +120,7 @@ wide_repeats2 <- wide_repeats %>%
 
 
 wide_repeats3 <- wide_repeats2 %>%
-  mutate(grouper = c(1,2,9,10,3,4,5,6,7,8,13,14,11,12)) %>%
+  mutate(grouper = c(1,2,9,10,3,4,5,6,7,8,13,14,11,12,17,18,2.3,2.4)) %>%
   arrange(grouper)
 
 
@@ -149,10 +154,12 @@ sd_function <- function(m1,m2,s1,s2,n1=size1,n2=size2){
 
 [*NB the guidance I followed suggested that as part of preparing for this analysis, I should recalculate a grand N based on all groups within the study and use this to calculate variance - see https://www.metafor-project.org/doku.php/analyses:gleser2009, about half-way down under heading* **Quantitative response variables**: *"In addition, the total sample sizes of the individual studies are needed for further computations" etc. I am not sure of the rationale for this and cannot tell by reading up other examples whether the variances have been calculated in this way. Also using this version computes the effect sizes by hand using shared standard deviation measure and doing so I do not get quite identical scores: see below. es, yi and yiN are all effect sizes from different calculations, you can see that the effect size from the grand N is somewhat different from the other two. vi and viN are the two variance calculations, again they differ. This is more striking for the multiple comparison example (FAY089) but even the other ones are changed... which concerns me a little!*
 
-```{r, different_effects}
-dfm_e3 %>%
-select(study_id, n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat, sdpi, es,yi, yiN, vi,viN)   %>%
+```{r, different_effects, echo = F}
+checkin <- dfm_e3 %>%
+select(study_id, n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat,  es,yi, yiN,sdpi,  se, vi,viN)   %>%
   slice(11:19)
+
+flextable(checkin)
 
 ```
 [*NB this is the code I have used to create this. the viN one seems strange to me - missing a bracket? But I have copied the reference in the above link and can't find guidance on any other way to do this....*]
@@ -170,7 +177,7 @@ dfm_e3 <- dfm_e3 %>%
 
 A correlation matrix was produced based on published relationships between cognitive screens: MoCA with MMSE [@Nasreddine2005], MMSE with ACE (ACE-III) [@MatiasGuiu2017], MMSE with TYM [@Zande2017]. Other relationships were estimated but are not actually required as these relationships are not relevant for these studies.
 
-```{r, callingR}
+```{r, callingR, echo = F}
 R
 ```
 
@@ -179,12 +186,16 @@ R
 # Other Interaction effects?
 
 There is a lot more that could be looked at, I will continue to explore but here are some thoughts.
+Beyond these there are things such as type of pain category, gender ratio (pooled across control and treatment?), education matching, age diffs...
+
+One major one I realised I wanted to do was subsetting those studies without exclusions by cognitive screen cut-off - I've just run out of time at this point is all.
 
 ## Pain
 
+NB I've started to incorporate pain into the main report.
 There are a wide range of measures taken as shown below. Measures have been presented as negative when higher scores represent better health/lower pain.
 
-```{r pain_measures, echo=TRUE}
+```{r pain_measures, echo=F}
 dfm_mod %>%
   group_by(pain_measure) %>%
   summarise(
@@ -193,8 +204,9 @@ dfm_mod %>%
                         )
 ```
 
+This uses raw pain scores of the patient group (not differences, as the data for controls is rare). Effect sizes are greater as ratings on a visual analogue scale (VAS) go up. But scores on the SF-MPQ show a different direction...
 
-``` {r, pain}
+``` {r, pain, echo = F}
 dfm_mod %>%
   mutate(
     sta_pain = ifelse(pain_measure == "PVAS (0-100)", (pain_mean_treat*.1)/(pain_sd_treat*.1), pain_mean_treat/pain_sd_treat),
@@ -205,8 +217,25 @@ dfm_mod %>%
 
 ```
 
+I have started to incorporate this into the model
+
+## Medication status
+
+Only mconf[[2,2]] studies controlled adequately for medication. 
+I ran a separate analysis for this group and it came out with a significantly higher estimate. however this also includes studies that were not well-controlled for education and age
+
+```{r, meds_cont, echo = F}
+che.model_medscon
+```
 
 
+If I also control for these, we get even bigger estimates but for a really small dataset:
 
+```{r allcon, echo = F}
+che.model_allcon
 
+```
 
+And it then gets quite difficult to do things like look at moderators (eg absolute age of patients or pain diffs). I have got quite full up with different versions of models and think I need to stop and take a step back!
+
+# References

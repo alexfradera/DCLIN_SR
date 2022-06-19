@@ -9,6 +9,7 @@ df <- read.xlsx("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\
 
 df2<- df %>% 
   mutate(across(!c(
+    unique_id,
     qual_1_reason,
     qual_2_reason,
     qual_3_reason,
@@ -16,7 +17,13 @@ df2<- df %>%
     qual_6_reason,
     qual_7_reason,
     qual_8_reason,
-    q5_other_confound), factor))
+    q5_other_confound), factor),
+    unique_id = if_else(unique_id == "TER167-A", "TER167-COMB", unique_id ))
+    
+    
+    
+    
+
 
 
 df3 <- df2 %>% distinct(study_id,  .keep_all= TRUE)
@@ -69,10 +76,15 @@ count(df4,q6_score_final)
 
 
 justauthors <- dfm_mod %>%
-  select(author_final,study_id,cognitive_name)
+  select(author_final,study_id, unique_id, cognitive_name)
 
-df5 <- left_join(df4,justauthors, by="study_id")
+# df5 <- left_join(df4,justauthors, by="study_id")
+df5 <- left_join(df4,justauthors, by=c("unique_id", "study_id"))
 df5 <-  mutate_all(df5,factor)
+
+
+
+quality_descripts <- df5
 
 quality_scores <- df5 %>%
   transmute(
@@ -115,8 +127,11 @@ write.xlsx(quality_scores_vals, "quality_scores_vals.xlsx", asTable = FALSE, ove
 
 
 # ====
-df7 <- filter(df5, cognitive_name=="MMSE")
-qualityset <- df7
+unique_codes <- dfm_mod %>% select(study_id, unique_id)
+recuperated <- full_join(unique_codes,df5)
+
+recup_mmse <- filter(recuperated, cognitive_name=="MMSE")
+qualityset <- recup_mmse
 slots <- sum(!is.na(qualityset$study_id))
 
 png(file = "qual_plot_mmse.png", width = 2800, height = 2400, res = 300)
@@ -175,3 +190,75 @@ points( rep(10,slots), slots:1, pch=19, col=cols[qualityset$qual_8_score], cex=2
 text(10, slots:1, syms[qualityset$qual_8_score], cex=0.8) 
 text(4:10, slots+2, c("1", "2", "3", "5","6", "7", "8")) 
 dev.off()
+
+# =================
+# MEDICATION
+
+# how many instances of recording or controlling meds
+mrecs <- count(df5, q_5_med_recorded =="yes")
+mconf <- count(df5, q6_med_confound =="no")
+
+# how many also were generally well-controlled:
+goodmeds <- df5 %>%
+  filter(q6_med_confound =="no")
+goodmeds_plus <- goodmeds %>%
+  filter(q5_6_age_confound =="no" & q5_6_ed_confound =="no" )
+
+sharemeds <- df5 %>% 
+  mutate( medscon = case_when(
+                            q6_med_confound == "no" ~0,
+                            q6_med_confound =="uncontrolled difference" ~ 1,
+                            q6_med_confound == "unknown" ~ 999  )
+         ) %>%
+  replace_with_na(replace=list(medscon=999)) %>%
+  select(unique_id,medscon)
+
+
+
+
+
+
+# data for meds added into the main model
+dfm_all_confs <- left_join(multismd,sharemeds, by="unique_id")
+
+## plugging in with other moderators: too many redundancies, fails...
+#che.model_moderators <- rma.mv(yi_cogN, mods = cbind(medscon, age_mean_cont, yi_pain),
+#                        V = V,
+#                        random = ~ 1 | study_num/unique_id,
+#                        data = dfm_all_confs,
+#                        sparse = TRUE)
+
+# ======
+# subsetted model with controlled medication only
+
+dfm_medscon <- semi_join(multismd,goodmeds)
+
+V_mc <- vcalc(vi=vi_cogN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+               obs=cognitive_name, rho=R, data=dfm_medscon)
+
+che.model_medscon <- rma.mv(yi_cogN ~ 1,
+                         V = V_mc,
+                         random = ~ 1 | study_num/unique_id,
+                         data = dfm_medscon,
+                         sparse = TRUE)
+
+#
+
+dfm_allcon <- semi_join(multismd,goodmeds_plus)
+
+V_mt <- vcalc(vi=vi_cogN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+              obs=cognitive_name, rho=R, data=dfm_allcon)
+
+che.model_allcon <- rma.mv(yi_cogN,
+                            V = V_mt,
+                            random = ~ 1 | study_num/unique_id,
+                            data = dfm_allcon,
+                            sparse = TRUE)
+
+che.model_allcon_mods <- rma.mv(yi_cogN, mods = age_mean_cont,
+                                V = V_mt,
+                                random = ~ 1 | study_num/unique_id,
+                                data = dfm_allcon,
+                                sparse = TRUE)
+
+
