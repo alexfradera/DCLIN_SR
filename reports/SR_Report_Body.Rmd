@@ -49,7 +49,11 @@ require("knitr")
 # citation("metafor") etc
 
 ```
-
+```{r captions, include=FALSE, eval=TRUE}
+library(captioner)
+figure_nums <- captioner(prefix = "Fig.")
+table_nums <- captioner(prefix = "Table")
+```
 
 
 
