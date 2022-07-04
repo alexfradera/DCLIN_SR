@@ -2,7 +2,7 @@
 library(datapasta)
 library(meta)
 library(metafor)
-library(dmetar)
+#library(dmetar)
 library(tidyverse)
 library(ggplot2)
 library(openxlsx)
@@ -18,7 +18,25 @@ library(ggplotify)
 library("flextable")
 library("ftExtra")
 library(stringr)
+library(pryr) # for shortcuts using partial
+library(captioner)
+#---------------------------------
+# FUNCTIONS
+#---------------------------------
 
+## Secondly, computing functions that will be re-used repeatedly later.
+
+#-------------------------
+# Caption making function.
+figure_nums <- captioner(prefix = "Fig.")
+table_nums <- captioner(prefix = "Table") #Not currently used
+sup_figure_nums <- captioner(prefix = "Supplementary Fig.")
+sup_table_nums <- captioner(prefix = "Supplementary Table")
+
+citef <- partial(figure_nums, display = "cite")
+citet <- partial(table_nums, display = "cite")
+citesf <- partial(sup_figure_nums, display = "cite")
+citest <- partial(sup_table_nums, display = "cite")
 
 # ==================
 # read and clean dataset

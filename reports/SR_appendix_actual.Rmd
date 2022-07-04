@@ -23,11 +23,6 @@ output:
 bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_biblio.bib'
 csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
 ---
-
-# Approach
-Approach: one main analysis (possibly do a simple version under the hood and the more complex model just to check not wildly off) with every study. This can include measure type as a moderator.Then a sensitivity version dropping studies that you have a rationale to drop. And then possibly a few more sub-analyses, eg only those with similar depression scores – but may prefer to just inspect the data – eg order the forest plot by variables (eg categorical y/n depression)
-
-
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 require("knitr")
@@ -47,6 +42,115 @@ require("knitr")
 # citation("metafor") etc
 
 ```
+
+
+```{r, diagnosis breakdown}
+#### Creation of table - move to appendix?
+
+levs = c("3","6","12","24","Not reported")
+minimum_onset <- dfm_mod %>%
+  mutate(minimum_months = ifelse(is.na(pain_onset_min), "Not reported", pain_onset_min),
+         minimum_months = factor(minimum_months, labels  = levs) )%>%
+        # ) %>%
+  group_by(minimum_months) %>%
+  summarise(n(),
+            average_years = sum(!is.na(pain_duration_mean))) 
+
+mintab <- flextable(minimum_onset)
+
+set_header_labels(mintab, 
+                  minimum_months = "min pain duration (months)",
+                                    `n()` = "n",
+                                    average_years = "n where mean condition/pain duration reported"
+                  )
+
+# Diagnoses are summarised in `r citest("diagnoses")`.
+
+```
+
+
+
+
+```{r captions, include=FALSE, eval=TRUE}
+
+
+set_flextable_defaults(font.family = "Calibri (Body)",
+                       font.size = 9,  
+                       font.color = "black",
+                       # italic = FALSE,
+                       digits = 0, 
+                       border.color = "#000000",
+                       padding.bottom = 1,
+                       padding.top = 1,
+                       padding.left = 3,
+                       padding.right = 1)
+
+
+fp_text_default(
+  color = "#000000",
+  bold = FALSE,
+  italic = FALSE,
+  underlined = FALSE,
+    cs.family = NULL,
+  eastasia.family = NULL,
+  hansi.family = NULL,
+  vertical.align = "baseline",
+  shading.color = "transparent"
+)
+
+library(captioner)
+figure_nums <- captioner(prefix = "Fig.")
+table_nums <- captioner(prefix = "Table")
+sup_figure_nums <- captioner(prefix = "Supplementary Fig.")
+sup_table_nums <- captioner(prefix = "", levels = 0)
+
+#set the table caption styling
+knitr::opts_chunk$set(tab.cap.pre = "Supplementary Table ")
+
+# Supplementary figure definition (keep same as in Appendix for order)
+
+
+
+sup_figure_nums(name="just_testing", caption = "**I'm just testing") 
+sup_figure_nums(name="just_testing2", caption = "I'm still just testing") 
+sup_table_nums(name="diagnoses", caption = "") 
+
+
+
+
+```
+
+
+# Data overview
+**`r sup_figure_nums("just_testing")`
+```{r, diagnosis_table, echo= FALSE}
+cond_tab <- dfm2 %>%
+  group_by(sample_treat_cat, sample_treat) %>%
+  summarise(
+            count = n()
+                        )
+
+
+
+wide_conds <-cond_tab %>%
+pivot_wider( names_from = sample_treat_cat,
+                             values_from = count)
+
+conds_tab <- wide_conds %>%
+  mutate(across(everything(), ~ ifelse(!is.na(.), paste0(sample_treat," (", ., ")"
+                                                        ),""))) %>%
+  select(!sample_treat)
+
+library(officer)
+fd <- flextable(conds_tab)
+set_caption(fd, "Summary of diagnoses recorded for included studies")
+```
+ 
+# Approach
+Approach: one main analysis (possibly do a simple version under the hood and the more complex model just to check not wildly off) with every study. This can include measure type as a moderator.Then a sensitivity version dropping studies that you have a rationale to drop. And then possibly a few more sub-analyses, eg only those with similar depression scores – but may prefer to just inspect the data – eg order the forest plot by variables (eg categorical y/n depression)
+
+
+
 
 # Data checking
 ```{r, mean_distro, echo = F}
