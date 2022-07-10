@@ -1,13 +1,79 @@
 # SBEP_staff_script_q3
 
-source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\vi_yi.R")
+source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid2.R")
 
 # ===============================
 # Models
 # ===============================
 
+#== model head and tail - for Forest plot depiction
+# NB important this does not separate studies across plots - more for useability than anything.
+# default would split Ojeda et al. Country arrangement preserves study by study but in new order.
+overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/data/study_overview_sheet.xlsx")
+overview <- select(overview,-study_num)
+dfm_studies <- left_join(dfm_mod,overview, by="study_id")
+countrified <- dfm_studies %>%
+  arrange(country)
+rows = nrow(countrified)
+hed <- round(rows/2,digits=0)
+tel = rows = hed
 
+dfm_hed <- head(countrified,hed)
+dfm_tel <- tail(countrified,tel)
+
+
+
+
+# high quality comparisons only
+qual_tog <- quality_scores_vals %>%
+  select(unique_id, toggle)
+dfm_mod <- left_join(dfm_mod,qual_tog, by="unique_id") 
+
+dfm_hi <- dfm_mod %>%
+  filter(toggle==1)
+  
+# only uniques - no within-study heterogeneity. for exploration only
+  dfm_test <- dfm_mod %>%
+    filter(comp==1)
+
+  
+  
+  
+  
+### SCREENS  ###
+# only mmse 
+  dfm_mmse <- dfm_mod %>%
+    filter(cognitive_name =="MMSE")
+
+  table(dfm_mmse$toggle) # no of hi-qual available
+  
+# only moca
+  dfm_moca <- dfm_mod %>%
+    filter(cognitive_name =="MoCA") 
+  
+  table(dfm_moca$toggle) # no of hi-qual available
+  
+  dfm_moca_q <- filter(dfm_moca, toggle==1)    
+  
+# compliment to only mmse - for depiction purposes?
+  dfm_not_mmse <- dfm_mod %>%
+    filter(cognitive_name !="MMSE")
+   #  mutate(author_final2 = str_trunc(author_final,19, "right"))
+
+### Patient groups ###
+  table(dfm_mod$sample_treat_cat)
+  
+  dfm_maincons <- dfm_mod %>%
+    filter(sample_treat_cat %in% c("Arthritis","Fibromyalgia","Headache","MSK"))
+  
+
+  
+## depression-free
+  depcut<- filter(aim2,q6_mood_confound == "comparable")
+  dfm_depfree <- semi_join(dfm_mod,depcut, by="study_id")
+  dfm_depfree_q <- filter(dfm_depfree, toggle==1)     
 # ===============================
+# FULL MODEL
 # 1 simple random-effects model (no accounting for non-independence)
 simple <- rma(yi, vi, data=dfm_mod)
 simple
@@ -18,23 +84,11 @@ simple2
 
 forest(simple, slab = dfm_mod$author_final)
 
-
-
 # ====================================================
 # 2 Preparing data for CHE model
 
-# # constant sampling correlation assumption
-# rho <- 0.6 # initial guess
-# # constant sampling correlation working model
-# V <- with(dfm_mod, 
-#            impute_covariance_matrix(vi = vi,
-#                                     cluster = study_id,
-#                                     r = rho))
-## Deprecated for fuller covariance matrix below
 
-
-
-# or collect rho in here:
+# Collect rho in here:
 R <- matrix(1, nrow=5, ncol=5)
 diag(R) <- 1
 R[1,2]<- R[2,1] <- 0.87 # MMSE and MoCA - Nasreddine paper
@@ -49,11 +103,23 @@ R[3,5]<- R[5,3] <- 0.75  # TYM & HVLT GUESS
 R[4,5]<- R[5,4] <- 0.75  # ACE & HVLT GUESS
 rownames(R) <- colnames(R) <- c("MMSE","MoCA","TYM","ACE","HVLT")
 
+# create variance-covariance matrix (diagonal contains variances)
+quick_v <- function(dataset){
+   vcalc(vi=vi, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
+        obs=cognitive_name, rho=R, data=dataset) }
 
-V <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
-           obs=cognitive_name, rho=R, data=dfm_mod)
+V <- quick_v(dfm_mod)
+Vhed <- quick_v(dfm_hed)
+Vtel <- quick_v(dfm_tel)
+Vhi <- quick_v(dfm_hi)
+Vmms <- quick_v(dfm_mmse)
+Vmoc <- quick_v(dfm_moca)
+Vmaincons <- quick_v(dfm_maincons)
+# Vcomp <- quick_v(dfm_test)
 
-# check that the 5 studies are covered - note that those with only screen differences map perfectly onto the 
+Vs <- blsplit(V, dfm_mod$study_num) # this works but can only subset some of the lower value elements for some reason
+
+# QA step: check  studies are covered - note that those with only screen differences map perfectly onto the 
 cov2cor(V[dfm_mod$study_num == 89, dfm_mod$study_num == 89])
 cov2cor(V[dfm_mod$study_num == 121, dfm_mod$study_num == 121]) # MMSE and MOCA
 cov2cor(V[dfm_mod$study_num == 134, dfm_mod$study_num == 134]) # MMSE and TYM for part of it
@@ -64,42 +130,66 @@ cov2cor(V[dfm_mod$study_num == 994, dfm_mod$study_num == 994]) # MMSE 2 groups
 
 # 3. start running Correlated and Hierarchical Effects models:
 # 3a Raw CHE model:
+rmvee <- function(dataset,vmat, modifier=""){
+  if (is.na(modifier)){
+                  rma.mv(yi, V= vmat, 
+                     data = dataset, 
+                     random = ~ 1 | study_num/unique_id, 
+                     test ='t', 
+                     method = "REML",
+                     mod = modifier,
+                       sparse = TRUE) 
+                    }
+              else {
+                rma.mv(yi, V = vmat, 
+                       data = dataset, 
+                       random = ~ 1 | study_num/unique_id, 
+                       test ='t', 
+                       method = "REML",
+                       sparse = TRUE)
+                     }
+}
 
-che.model <- rma.mv(yi ~ 1,
-                    V = V,
-                    random = ~ 1 | study_num/unique_id,
-                    data = dfm_mod,
-                    sparse = TRUE)
 
-conf_int(che.model, 
-         vcov = "CR2")
 
-# 3b CHE model using values computed using grand N
-# The function computes predicted values, corresponding standard errors, confidence intervals, and prediction intervals 
+che.model <- rmvee(dfm_mod,vmat=V)
+ che.hed <- rmvee(dfm_hed,vmat=Vhed)
+#  che.tel <- rmvee(dfm_tel,vmat=Vtel)
+# che.test <- rmvee(dfm_test,vmat=Vcomp)
+#che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
+#che.moca <- rmvee(dfm_moca,vmat=Vmoc)
+che.groups <-    rma.mv(yi, V= Vmaincons,
+                      data = dfm_maincons,
+                       random = ~ 1 | study_num/unique_id,
+                       test ='t',
+                       method = "REML",
+                       mod = ~ sample_treat_cat -1,
+                       sparse = TRUE)
 
-che.model_N <- rma.mv(yiN ~ 1,
-                    V = V,
-                    random = ~ 1 | study_num/unique_id,
-                    data = dfm_mod,
-                    sparse = TRUE)
 
+
+i2 <- var.comp(che.model)
+i2$plot
+
+
+# W <- solve(V)
+#  X <- model.matrix(che.modelY)
+#  P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+#  100 * che.modelY$tau2 / (che.modelY$tau2 + (che.modelY$k-che.modelY$p)/sum(diag(P)))
 
 # This produces the key outcomes.
-study_outputs <- predict(che.model_N, digits=2)
+study_outputs_overall <- predict(che.model, digits=2)
+p<- conf_int(che.model, vcov = "CR2")
 
 
-# check residuals
-resids_cheN <- as.tibble(rstudent(che.model_N)$resid)
-ggplot(data = resids_cheN, mapping = aes(x=1, y=value)) + geom_violin() +
-  scale_x_continuous(breaks=NULL) +
-  theme(axis.title.x = element_blank()) + ylab("residuals - CHE")
+
 
 
 # 4 use CHE model with robust inference methods
 
 
-sav <- robust(che.model_N, cluster=study_id, clubSandwich=TRUE)
-resids_sav <- as.tibble(residuals(sav))
+rve.model <- robust(che.model, cluster=study_id, clubSandwich=TRUE)
+resids_sav <- as.tibble(residuals(rve.model))
 ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
   scale_x_continuous(breaks=NULL) +
   theme(axis.title.x = element_blank()) + ylab("residuals - Sandwich")
@@ -112,54 +202,7 @@ ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
 
 # ============================================================
 
-# adding more yi and vi for other measures
 
-multismd <- dfm_mod %>%
-  # filter(pain_measured_cont=="yes") %>%
-  mutate(yi_cog = yi,
-         vi_cog = vi,
-         yi_cogN = yiN,
-         vi_cogN = viN) %>%
-  select(!c(yi,vi,yiN,viN))
-
-multismd  <- escalc(measure="SMD",
-                    n1i = n_cont,
-                    m1i = pain_mean_cont, 
-                    sd1i = pain_sd_cont, 
-                    n2i = n_treat ,
-                    m2i = pain_mean_treat ,    # mean of group 2
-                    sd2i = pain_sd_treat,  # standard error of group 2
-                    data = multismd,
-                    vtype="AV") # this incorporates sample-size weighted average of Hedges'g values.
-multismd <- multismd %>%
-  mutate(yi_pain = yi,
-         vi_pain = vi) %>%
-  select(!c(yi,vi))
-
-multismd  <- escalc(measure="SMD",
-                    n1i = n_cont,
-                    m1i = age_mean_cont, 
-                    sd1i = age_sd_cont, 
-                    n2i = n_treat ,
-                    m2i = age_mean_treat ,    # mean of group 2
-                    sd2i = age_sd_treat,  # standard error of group 2
-                    data = multismd,
-                    vtype="AV") # this incorporates sample-size weighted average of Hedges'g values.
-multismd <- multismd %>%
-  mutate(yi_age = yi,
-         vi_age = vi) %>%
-  select(!c(yi,vi))
-
-## ======
-
-
-multismd %>% select(yi_pain, pain_mean_cont,pain_mean_treat)
-
-che.model_pain <- rma.mv(yi_cog ~ 1 + yi_pain,
-                     V = V,
-                     random = ~ 1 | study_num/unique_id,
-                     data = multismd,
-                     sparse = TRUE)
 
 
 
@@ -170,51 +213,63 @@ che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
                      data = dfm_mod,
                      sparse = TRUE)
 
-# alternative - pain group
-che.model_age <- rma.mv(yi ~ 1 + age_mean_cont,
-                     V = V,
-                     random = ~ 1 | study_num/unique_id,
-                     data = dfm_mod,
-                     sparse = TRUE)
 
-dfm_mod_sift <- dfm_mod %>%
-  filter(yi<3)
-siftV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
-               obs=cognitive_name, rho=R, data=dfm_mod_sift)
+# ===========================
+
+modeloutputs <- list
+modelnames <- c("Total dataset", "Fixed effect", "MMSE", "MoCA")
 
 
-che.model_age_sift <- rma.mv(yi ~ 1 + age_mean_cont,
-                        V = siftV,
-                        random = ~ 1 | study_num/unique_id,
-                        data = dfm_mod_sift,
-                        sparse = TRUE)
+modelnow <-che.model
 
-## ====
-# Models filtered by screen
 
-# MMSE model
-dfm_mmse <- dfm_mod %>%
-  filter(cognitive_name =="MMSE") %>%
-  mutate(author_final = str_trunc(author_final,19, "right"))
 
-mmseV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
-               obs=cognitive_name, rho=R, data=dfm_mmse)
 
-che.model_mmse <- rma.mv(yiN ~ 1,
-                         V = mmseV,
-                         random = ~ 1 | study_num/unique_id,
-                         data = dfm_mmse,
-                         sparse = TRUE)
-# Other models
-dfm_screens <- dfm_mod %>%
-  filter(cognitive_name !="MMSE")
 
-screenV <- vcalc(vi=viN, cluster=study_num, grp1=sample_cont, grp2=sample_treat, w1=n_cont, w2=n_treat,
-                 obs=cognitive_name, rho=R, data=dfm_screens)
+study_outputs <- predict(modelnow, digits=2)
+raw_overall <- round(as_tibble(study_outputs), digits=3)
+presentable <- raw_overall %>%
+  transmute(
+    type = "Total dataset",
+    n = modelnow$k,
+    conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
+    pval = ifelse (modelnow$pval < .001,"< .001", modelnow$pval),
+    i2 = round(var.comp(modelnow)$total, digits=2),
+    i2_2 = var.comp(modelnow)$results[2,2],
+    i2_3 = var.comp(modelnow)$results[3,2])    
+#modeloutputs[1] <- presentable
+#rm(study_outputs,raw_overall, presentable)
 
-che.model_screens <- rma.mv(yiN ~ 1,
-                            V = screenV,
-                            random = ~ 1 | study_num/unique_id,
-                            data = dfm_screens,
-                            sparse = TRUE)
 
+modelnow <-che.groups
+
+# study_outputs <- predict(modelnow,newmods = c("sample_treat_catArthritis","sample_treat_catFibromyalgia","sample_treat_catHeadache", "sample_treat_catMSK"), digits=2)
+# raw_overall <- round(as_tibble(study_outputs), digits=3)
+# presentable <- raw_overall %>%
+#   transmute(
+#     type = c("Ar","FM","Head","MSK"),
+#     n = modelnow$k,
+#     conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
+#     pval = ifelse (modelnow$pval < .001,"< .001", modelnow$pval),
+#     i2 = round(var.comp(modelnow)$total, digits=2),
+#     i2_2 = var.comp(modelnow)$results[2,2],
+#     i2_3 = var.comp(modelnow)$results[3,2])   
+# 
+# 
+# modelnow <-rve.model
+#     
+# study_outputs_fixed <- predict(simple, digits=2)
+# raw_fixed <- round(as_tibble(study_outputs_fixed), digits=3)
+# present_fixed <- raw_fixed %>%
+#   transmute(
+#     type = "RVE",
+#     n = simple$k,
+#     conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
+#     pval = ifelse (simple$pval < .001,"< .001", che.model$pval),
+#     i2 = simple$I2,
+#     i2_2 = "-",
+#     i2_3 = "-")   
+# combine <- rbind(present_overall, present_fixed)
+
+
+#===

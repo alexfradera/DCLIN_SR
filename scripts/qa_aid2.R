@@ -1,5 +1,8 @@
+source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\vi_yi.R")
+
 # qa_aid2
 df <- read.xlsx("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\quality_review.xlsx")
+
 
 df2<- df %>% 
   mutate(across(!c(
@@ -32,7 +35,7 @@ aim1 <- aim1 %>%
 
 # add in authornames from previous dataset
 justauthors <- dfm_mod %>%
-  select(author_final,study_id, unique_id, cognitive_name)
+  select(author_final,study_id, unique_id, cognitive_name, comp)
 
 aim2 <- left_join(aim1,justauthors, by=c("unique_id", "study_id"))
 aim2 <-  mutate_all(aim2,factor)
@@ -40,6 +43,8 @@ aim2 <-  mutate_all(aim2,factor)
 
 quality_scores_f <- aim2 %>%
   transmute(
+    study_id =study_id,
+    comp = comp,
     Study = author_final,
     unique_id = unique_id,
     J1 = qual_1_score,
@@ -53,13 +58,7 @@ quality_scores_f <- aim2 %>%
     Weight = 1
   ) 
 
-
 # =======
-
-
-
-
-
 
 quality_scores_vals <- quality_scores_f %>% 
   mutate_at(.vars = vars(J1:J8), 
@@ -71,84 +70,12 @@ quality_scores_vals <- quality_scores_f %>%
 quality_scores_vals <-  quality_scores_vals %>%
   mutate(
         quality_quant = rowSums(across(where(is.numeric)),na.rm = T),
-        toggle = ifelse(J1 == 1 | J6 ==1| J8 ==1, 0,1)
+        toggle = as.factor(ifelse(J1 == 1 | J6 ==1| J8 ==1, 0,1))
         )
-
-
-
-
 
 options("openxlsx.borderColour" = "#4F80BD") #
 write.xlsx(quality_scores_vals, "quality_scores_vals.xlsx", asTable = FALSE, overwrite = TRUE)
 
 
+qualityset<- quality_scores_vals # NB PLACEHOLDER
 
-#====
-
-# filter only mmse-based quality scores
-mmse_filter <- filter(dfm_mod, cognitive_name=="MMSE")
-quality_mmse <- semi_join(quality_scores_vals,mmse_filter, by="unique_id")
-
-
-
-qualityset <- quality_mmse
-slots <- sum(!is.na(qualityset$unique_id))
-modelnow <- che.model_mmse
-
-png(file = "qual_plot_mmse.png", width = 2800, height = 2400, res = 300)
-
-forest(modelnow, slab=author_final, annotate=FALSE, addfit=FALSE, addpred=FALSE, 
-       showweights=FALSE, header=TRUE,  order = cognitive_name, alim=c(-1,3), xlim=c(-12,12), main="JBI Critical Appraisal scores - MMSE comparisons")
-
-cols <- c("red", "yellow","green")
-syms <- c( "-", "?","+")
-
-points( rep(4,slots), slots:1, pch=19, col=cols[qualityset$J1], cex=2)
-text(4, slots:1, syms[qualityset$J1], cex=0.8)
-points( rep(5,slots), slots:1, pch=19, col=cols[qualityset$J2], cex=2)
-text(5, slots:1, syms[qualityset$J2], cex=0.8)
-points( rep(6,slots), slots:1, pch=19, col=cols[qualityset$J3], cex=2)
-text(6, slots:1, syms[qualityset$J3], cex=0.8)
-points( rep(7,slots), slots:1, pch=19, col=cols[qualityset$J5], cex=2)
-text(7, slots:1, syms[qualityset$J5], cex=0.8)
-points( rep(8,slots), slots:1, pch=19, col=cols[qualityset$J6], cex=2)
-text(8, slots:1, syms[qualityset$J6], cex=0.8)
-points( rep(9,slots), slots:1, pch=19, col=cols[qualityset$J7], cex=2)
-text(9, slots:1, syms[qualityset$J7], cex=0.8)
-points( rep(10,slots), slots:1, pch=19, col=cols[qualityset$J8], cex=2)
-text(10, slots:1, syms[qualityset$J8], cex=0.8)
-text(4:10, slots+2, c("1", "2", "3", "5","6", "7", "8"))
-dev.off()
-
-
-# filter only other quality scores
-oscreen_filter <- filter(dfm_mod, cognitive_name!="MMSE")
-quality_other <- semi_join(quality_scores_vals,oscreen_filter, by="unique_id")
-
-qualityset <- quality_other
-slots <- sum(!is.na(qualityset$unique_id))
-modelnow <- che.model_screens
-
-png(file = "qual_plot_other_screens.png", width = 2800, height = 2400, res = 300)
-
-forest(modelnow, slab=author_final, annotate=FALSE, addfit=FALSE, addpred=FALSE, 
-       showweights=FALSE, header=TRUE,  order = cognitive_name, alim=c(-1,3), xlim=c(-12,12), main="JBI Critical Appraisal scores - MMSE comparisons")
-
-cols <- c("red", "yellow","green")
-syms <- c( "-", "?","+")
-points( rep(4,slots), slots:1, pch=19, col=cols[qualityset$J1], cex=2)
-text(4, slots:1, syms[qualityset$J1], cex=0.8)
-points( rep(5,slots), slots:1, pch=19, col=cols[qualityset$J2], cex=2)
-text(5, slots:1, syms[qualityset$J2], cex=0.8)
-points( rep(6,slots), slots:1, pch=19, col=cols[qualityset$J3], cex=2)
-text(6, slots:1, syms[qualityset$J3], cex=0.8)
-points( rep(7,slots), slots:1, pch=19, col=cols[qualityset$J5], cex=2)
-text(7, slots:1, syms[qualityset$J5], cex=0.8)
-points( rep(8,slots), slots:1, pch=19, col=cols[qualityset$J6], cex=2)
-text(8, slots:1, syms[qualityset$J6], cex=0.8)
-points( rep(9,slots), slots:1, pch=19, col=cols[qualityset$J7], cex=2)
-text(9, slots:1, syms[qualityset$J7], cex=0.8)
-points( rep(10,slots), slots:1, pch=19, col=cols[qualityset$J8], cex=2)
-text(10, slots:1, syms[qualityset$J8], cex=0.8)
-text(4:10, slots+2, c("1", "2", "3", "5","6", "7", "8"))
-dev.off()

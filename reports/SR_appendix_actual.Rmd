@@ -36,7 +36,7 @@ require("knitr")
  # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
 
 
- source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid.R", echo = FALSE)
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid2.R", echo = FALSE)
 
 
 # citation("metafor") etc
@@ -69,6 +69,11 @@ set_header_labels(mintab,
 ```
 
 
+```{r, violins, echo=F}
+ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
+  scale_x_continuous(breaks=NULL) +
+  theme(axis.title.x = element_blank()) + ylab("effect size")
+```
 
 
 ```{r captions, include=FALSE, eval=TRUE}
@@ -146,6 +151,20 @@ fd <- flextable(conds_tab)
 set_caption(fd, "Summary of diagnoses recorded for included studies")
 ```
  
+
+
+
+
+
+
+[*This table shows how `r sum(is.na(dfm_mod$pain_onset_min))` of comparisons did not provide an indication of minimum duration, either explicitly or via reference to a diagnosis that includes a minimum duration, and only a minority of these reported a mean duration of pain. For instance, rheumatoid arthritis is considered a chronic pain condition but the diagnostic criteria do not require a minimum period before a diagnosis is given]
+
+                  
+
+# put this outside the block to work <!---BLOCK_LANDSCAPE_START---> <!---BLOCK_LANDSCAPE_STOP--->
+# as per https://ardata-fr.github.io/officeverse/officedown-for-word.html#insert-sections
+
+
 # Approach
 Approach: one main analysis (possibly do a simple version under the hood and the more complex model just to check not wildly off) with every study. This can include measure type as a moderator.Then a sensitivity version dropping studies that you have a rationale to drop. And then possibly a few more sub-analyses, eg only those with similar depression scores – but may prefer to just inspect the data – eg order the forest plot by variables (eg categorical y/n depression)
 
@@ -341,5 +360,40 @@ che.model_allcon
 ```
 
 And it then gets quite difficult to do things like look at moderators (eg absolute age of patients or pain diffs). I have got quite full up with different versions of models and think I need to stop and take a step back!
+
+
+
+# check residuals
+# resids_che <- as.tibble(rstudent(che.model)$resid)
+# ggplot(data = resids_che, mapping = aes(x=1, y=value)) + geom_violin() +
+#  scale_x_continuous(breaks=NULL) +
+#  theme(axis.title.x = element_blank()) + ylab("residuals - CHE")
+
+
+# # raw calculate heterogeneity
+# # res.R <- che.model
+# # res.F <- che.model
+# 
+# c(100 * (vcov(res.R)[1,1] - vcov(res.F)[1,1]) / vcov(res.R)[1,1],
+#   100 * (vcov(res.R)[2,2] - vcov(res.F)[2,2]) / vcov(res.R)[2,2])
+
+#W <- solve(V)
+# X <- model.matrix(che.modelX)
+# P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+# 100 * res$tau2 / (res$tau2 + (res$k-res$p)/sum(diag(P)))
+
+Cognitive screen score standard mean differences within the dataset ranged from `r round(min(dfm_mod$yiN),2)` to `r round(max(dfm_mod$yiN),2)` as shown in the histogram below.
+
+``` {r, histos, echo = F}
+#dfm_mod %>%
+#  ggplot(mapping = aes(x=yi)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
+
+dfm_mod %>%
+  ggplot(mapping = aes(x=yi)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
+```
+
+In terms of change over time, reduction in chronic pain levels was associated with improvement in MoCA performance in @Bernardi2021[, however note a small sample], but not in @Alemanno2019, despite improvements observed on some other neuropsychological measures.
+
+Noise places demands "on a limited capacity of attention and information processing, leaving less capacity available to the task at hand" [@Boman2004,p.448] which aligns with one account of how pain impacts cognition.
 
 # References
