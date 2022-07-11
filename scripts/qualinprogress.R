@@ -20,8 +20,14 @@ forest(
                    at= seq(-1,5, by =1), xlim=c(-9,8),
                    showweights=FALSE, header=TRUE, 
                    ilab = cbind(cbind.data.frame(cognitive_name), cbind.data.frame(sample_treat_cat)),
-                   order = study_id, ilab.xpos = c(-4.2, -3.0), ilab.pos = 4, cex=.8, top = 0)
+                   order = study_id, ilab.xpos = c(-4.6, -3.4), ilab.pos = 4, cex=.8, top = 0)
 text(c(-4.2, -3.0), 64, c("Screen", "Condition"), cex=.8, font=2, adj = c(0, NA))
+abline(h = 10.5, col='grey', lty=2, lwd=1)
+abline(h = 20.5, col='grey', lty=2, lwd=1)
+abline(h = 30.5, col='grey', lty=2, lwd=1)
+abline(h = 40.5, col='grey', lty=2, lwd=1)
+abline(h = 50.5, col='grey', lty=2, lwd=1)
+
 dev.print(pdf, file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/Forest_rich.pdf" ,
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
@@ -63,6 +69,11 @@ points( rep(9,slots), seq(slots*15,by = -15), pch=19, col=cols[qualityset$J7], c
 text(9, seq(from = slots*15+2, to = 17, by = -15), syms[qualityset$J7], cex=0.7)
 points( rep(10,slots), seq(slots*15,by = -15), pch=19, col=cols[qualityset$J8], cex=1.6)
 text(10, seq(from = slots*15+2, to = 17, by = -15), syms[qualityset$J8], cex=0.7)
+abline(h = 0)
+abline(h = 160)
+abline(h = 310)
+abline(h = 460)
+abline(h = 610)
 dev.print(pdf, file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/quality_simp.pdf" ,
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 

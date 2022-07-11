@@ -2,6 +2,9 @@
 
 source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid2.R")
 
+
+
+
 # ===============================
 # Models
 # ===============================
@@ -17,7 +20,6 @@ countrified <- dfm_studies %>%
 rows = nrow(countrified)
 hed <- round(rows/2,digits=0)
 tel = rows = hed
-
 dfm_hed <- head(countrified,hed)
 dfm_tel <- tail(countrified,tel)
 
@@ -36,28 +38,28 @@ dfm_hi <- dfm_mod %>%
   dfm_test <- dfm_mod %>%
     filter(comp==1)
 
-  
-  
-  
-  
+
 ### SCREENS  ###
 # only mmse 
-  dfm_mmse <- dfm_mod %>%
+  dfm_mmse_all <- dfm_mod %>%
     filter(cognitive_name =="MMSE")
 
-  table(dfm_mmse$toggle) # no of hi-qual available
+  table(dfm_mmse_all$toggle) # no of hi-qual available
+  
+  
+  dfm_mmse <- filter(dfm_mmse_all, toggle==1)  
   
 # only moca
-  dfm_moca <- dfm_mod %>%
+  dfm_moca_all <- dfm_mod %>%
     filter(cognitive_name =="MoCA") 
   
-  table(dfm_moca$toggle) # no of hi-qual available
+  table(dfm_moca_all$toggle) # no of hi-qual available
   
-  dfm_moca_q <- filter(dfm_moca, toggle==1)    
+  dfm_moca <- filter(dfm_moca_all, toggle==1)    
   
 # compliment to only mmse - for depiction purposes?
-  dfm_not_mmse <- dfm_mod %>%
-    filter(cognitive_name !="MMSE")
+#  dfm_not_mmse <- dfm_mod %>%
+#    filter(cognitive_name !="MMSE")
    #  mutate(author_final2 = str_trunc(author_final,19, "right"))
 
 ### Patient groups ###
@@ -66,23 +68,39 @@ dfm_hi <- dfm_mod %>%
   dfm_maincons <- dfm_mod %>%
     filter(sample_treat_cat %in% c("Arthritis","Fibromyalgia","Headache","MSK"))
   
-
+  dfm_arthritis_full <-dfm_mod %>%
+    filter(sample_treat_cat %in% c("Arthritis"))
+  dfm_arthritis <- dfm_arthritis_full %>%
+    filter(toggle==1)
+  
+  
+  dfm_fm_full <-dfm_mod %>%
+    filter(sample_treat_cat %in% c("Fibromyalgia"))
+  dfm_fm <- dfm_fm_full %>%
+    filter(toggle==1)
+  
+  
   
 ## depression-free
   depcut<- filter(aim2,q6_mood_confound == "comparable")
-  dfm_depfree <- semi_join(dfm_mod,depcut, by="study_id")
-  dfm_depfree_q <- filter(dfm_depfree, toggle==1)     
-# ===============================
+  dfm_depfree_all <- semi_join(dfm_mod,depcut, by="study_id")
+  dfm_depfree<- filter(dfm_depfree_all, toggle==1)     
+
+# tidy
+  rm(aim1,df,df2,dfm, dfm_c,dfm_cd,dfm_cda,dfm_cdap,dfm_cdapa,dfm_e1,dfm_e2,dfm3)
+  
+  # ===============================
 # FULL MODEL
 # 1 simple random-effects model (no accounting for non-independence)
-simple <- rma(yi, vi, data=dfm_mod)
-simple
+ 
+    
+
 
 # with HSK
-simple2 <- rma(yi, vi, data=dfm_mod, method = "HSk")
-simple2
+#simple_hsk <- rma(yi, vi, data=dfm_mod, method = "HSk")
 
-forest(simple, slab = dfm_mod$author_final)
+
+# forest(simple, slab = dfm_mod$author_final)
 
 # ====================================================
 # 2 Preparing data for CHE model
@@ -113,7 +131,9 @@ Vhed <- quick_v(dfm_hed)
 Vtel <- quick_v(dfm_tel)
 Vhi <- quick_v(dfm_hi)
 Vmms <- quick_v(dfm_mmse)
-Vmoc <- quick_v(dfm_moca)
+Varth <- quick_v(dfm_arthritis)
+Vfm  <- quick_v(dfm_fm_full)
+# Vmoc <- quick_v(dfm_moca) unneeded, no clusters
 Vmaincons <- quick_v(dfm_maincons)
 # Vcomp <- quick_v(dfm_test)
 
@@ -151,13 +171,51 @@ rmvee <- function(dataset,vmat, modifier=""){
 }
 
 
-
+simple.model <- rma(yi, vi, data=dfm_mod)
+confint(simple.model)
+predict(simple.model)
 che.model <- rmvee(dfm_mod,vmat=V)
- che.hed <- rmvee(dfm_hed,vmat=Vhed)
-#  che.tel <- rmvee(dfm_tel,vmat=Vtel)
+che.ci <- confint(che.model)
+model.i2 <- var.comp(che.model)
+main_model_output <- predict(simple.model)
+rve.model <- robust(che.model, cluster=study_id, clubSandwich=TRUE) # substantially same as che.model
+
+
+
+
+res <- rma.mv(yi, vi, random = ~ factor(unique_id) | study_num, data=dfm_mod)
+res.ci <- confint(res)
+W <- diag(1/dfm_mod$vi)
+X <- model.matrix(res)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * res$tau2 / (res$tau2 + (res$k-res$p)/sum(diag(P))) ### total I^2
+100 * res.ci[[1]]$random[1,2:3] / (res.ci[[1]]$random[1,2:3] + (res$k-res$p)/sum(diag(P)))
+
+
+simple.hi <- rma(yi, vi, data=dfm_hi)
+confint(simple.hi)
+che.hi <- rmvee(dfm_hi,vmat=Vhi)
+hi.i2 <- var.comp(che.hi)
+
+
+# che.hed <- rmvee(dfm_hed,vmat=Vhed)
+# che.tel <- rmvee(dfm_tel,vmat=Vtel)
 # che.test <- rmvee(dfm_test,vmat=Vcomp)
-#che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
-#che.moca <- rmvee(dfm_moca,vmat=Vmoc)
+
+simple.mmse <- rma(yi, vi, data=dfm_mmse)
+che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
+mmse.i2  <- var.comp(che.mmse)
+forest(che.mmse, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
+              showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
+
+simple.moca <- rma(yi, vi, data=dfm_moca)
+# che.moca <- rmvee(dfm_moca,vmat=Vmoc) - no information, as no clusters here
+#moca.i2  <- var.comp(che.moca)
+#forest(che.moca, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
+#       showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
+
+
+simple.groups<- rma(yi, vi, data=dfm_maincons, mods= ~ sample_treat_cat -1)
 che.groups <-    rma.mv(yi, V= Vmaincons,
                       data = dfm_maincons,
                        random = ~ 1 | study_num/unique_id,
@@ -165,34 +223,23 @@ che.groups <-    rma.mv(yi, V= Vmaincons,
                        method = "REML",
                        mod = ~ sample_treat_cat -1,
                        sparse = TRUE)
+groups.i2  <- var.comp(che.groups)
+
+simple.arth <- rma(yi,vi, data=dfm_arthritis)
+che.arth <- rmvee(dfm_arthritis,vmat=Varth)
 
 
+simple.fm <- rma(yi,vi, data=dfm_fm_full)
+che.fm <- rmvee(dfm_fm_full,vmat=Vfm)
 
-i2 <- var.comp(che.model)
-i2$plot
 
-
-# W <- solve(V)
-#  X <- model.matrix(che.modelY)
-#  P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-#  100 * che.modelY$tau2 / (che.modelY$tau2 + (che.modelY$k-che.modelY$p)/sum(diag(P)))
-
-# This produces the key outcomes.
-study_outputs_overall <- predict(che.model, digits=2)
-p<- conf_int(che.model, vcov = "CR2")
+simple.dep <- rma(yi, vi, data=dfm_depfree)
 
 
 
 
 
-# 4 use CHE model with robust inference methods
 
-
-rve.model <- robust(che.model, cluster=study_id, clubSandwich=TRUE)
-resids_sav <- as.tibble(residuals(rve.model))
-ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
-  scale_x_continuous(breaks=NULL) +
-  theme(axis.title.x = element_blank()) + ylab("residuals - Sandwich")
 
 
 
@@ -207,7 +254,7 @@ ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
 
 
 # can also add a potential covariate
-che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
+che.model2 <- rma.mv(yi ~ cognitive_name -1,
                      V = V,
                      random = ~ 1 | study_num/unique_id,
                      data = dfm_mod,
@@ -216,60 +263,73 @@ che.model2 <- rma.mv(yi ~ 1 + cognitive_name,
 
 # ===========================
 
-modeloutputs <- list
-modelnames <- c("Total dataset", "Fixed effect", "MMSE", "MoCA")
 
+che_names <- c("Total dataset", "Low risk of bias", "MMSE","Arthritis","Fibromyalgia")
+che_modellist <- vector(mode = "list", length = 5)
+  che_modellist[[1]] <- che.model
+  che_modellist[[2]] <- che.hi
+  che_modellist[[3]] <- che.mmse
+  che_modellist[[4]] <- che.arth
+  che_modellist[[5]] <- che.fm
+che_tablelist <- vector(mode = "list", length = 5)
 
-modelnow <-che.model
-
-
-
-
-
+for (i in 1:5){
+modelnow <-che_modellist[[i]]
+names <- che_names
 study_outputs <- predict(modelnow, digits=2)
 raw_overall <- round(as_tibble(study_outputs), digits=3)
 presentable <- raw_overall %>%
   transmute(
-    type = "Total dataset",
+    order = i,
+    type = names[i],
+    method = "Multi-level approach",
     n = modelnow$k,
-    conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
-    pval = ifelse (modelnow$pval < .001,"< .001", modelnow$pval),
+    justes =  pred,
+    conf = paste0(pred, " [", ci.lb, " - ",  ci.ub,"]"),
+    pval = ifelse (modelnow$pval < .001,"< .001", as.character(round(modelnow$pval,3))),
     i2 = round(var.comp(modelnow)$total, digits=2),
     i2_2 = var.comp(modelnow)$results[2,2],
-    i2_3 = var.comp(modelnow)$results[3,2])    
+    i2_3 = var.comp(modelnow)$results[3,2])
+che_tablelist[[i]]<- presentable
+rm(presentable,study_outputs,raw_overall)}   
 #modeloutputs[1] <- presentable
 #rm(study_outputs,raw_overall, presentable)
+bind_rows(che_tablelist)
 
 
-modelnow <-che.groups
-
-# study_outputs <- predict(modelnow,newmods = c("sample_treat_catArthritis","sample_treat_catFibromyalgia","sample_treat_catHeadache", "sample_treat_catMSK"), digits=2)
-# raw_overall <- round(as_tibble(study_outputs), digits=3)
-# presentable <- raw_overall %>%
-#   transmute(
-#     type = c("Ar","FM","Head","MSK"),
-#     n = modelnow$k,
-#     conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
-#     pval = ifelse (modelnow$pval < .001,"< .001", modelnow$pval),
-#     i2 = round(var.comp(modelnow)$total, digits=2),
-#     i2_2 = var.comp(modelnow)$results[2,2],
-#     i2_3 = var.comp(modelnow)$results[3,2])   
-# 
-# 
-# modelnow <-rve.model
-#     
-# study_outputs_fixed <- predict(simple, digits=2)
-# raw_fixed <- round(as_tibble(study_outputs_fixed), digits=3)
-# present_fixed <- raw_fixed %>%
-#   transmute(
-#     type = "RVE",
-#     n = simple$k,
-#     conf = paste0(pred, " (", ci.lb, "-",  ci.ub,")"),
-#     pval = ifelse (simple$pval < .001,"< .001", che.model$pval),
-#     i2 = simple$I2,
-#     i2_2 = "-",
-#     i2_3 = "-")   
-# combine <- rbind(present_overall, present_fixed)
+simp_names <-c(che_names, "MoCA", "Matched depression")
+simp_modellist <- vector(mode = "list", length = 7)
+simp_tablelist <- vector(mode = "list", length = 7)
+simp_modellist[[1]] <- simple.model
+simp_modellist[[2]] <- simple.hi
+simp_modellist[[3]] <- simple.mmse
+simp_modellist[[4]] <- simple.arth
+simp_modellist[[5]] <- simple.fm
+simp_modellist[[6]] <- simple.moca
+simp_modellist[[7]] <- simple.dep
 
 
-#===
+for (i in 1:7){
+modelnow <-simp_modellist[[i]]
+names <- simp_names
+study_outputs <- predict(modelnow, digits=2)
+raw_overall <- round(as_tibble(study_outputs), digits=3)
+presentable <- raw_overall %>%
+  transmute(
+    order = i,
+    type = names[i],
+    method = "Random Effects",
+    justes =  pred,
+    n = modelnow$k,
+    conf = paste0(pred, " [", ci.lb, " - ",  ci.ub,"]"),
+    pval = ifelse (modelnow$pval < .001,"< .001", as.character(round(modelnow$pval,3))),
+    i2 = round(modelnow$I2),
+    i2_2 = "",
+    i2_3 = "")
+simp_tablelist[[i]]<- presentable 
+rm(presentable,study_outputs,raw_overall)}  
+bind_rows(simp_tablelist)
+
+total_table <- bind_rows(che_tablelist,simp_tablelist)
+total_table <- total_table %>% arrange(order,method)
+total_table <- as.tibble(total_table)
