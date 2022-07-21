@@ -34,6 +34,10 @@ dfm_mod <- left_join(dfm_mod,qual_tog, by="unique_id")
 dfm_hi <- dfm_mod %>%
   filter(toggle==1)
   
+dfm_lo <- dfm_mod %>%
+  filter(toggle==0)
+
+
 # only uniques - no within-study heterogeneity. for exploration only
   dfm_test <- dfm_mod %>%
     filter(comp==1)
@@ -76,14 +80,21 @@ dfm_hi <- dfm_mod %>%
   
   dfm_fm_full <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Fibromyalgia"))
-  dfm_fm <- dfm_fm_full %>%
-    filter(toggle==1)
+  #dfm_fm <- dfm_fm_full %>%
+  #  filter(toggle==1)
   
   
+  dfm_msk_full <-dfm_mod %>%
+    filter(sample_treat_cat %in% c("MSK"))
+  #dfm_fm <- dfm_fm_full %>%
+  #  filter(toggle==1)
+  
+  dfm_head_full <-dfm_mod %>%
+    filter(sample_treat_cat %in% c("Headache"))
   
 ## depression-free
   depcut<- filter(aim2,q6_mood_confound == "comparable")
-  dfm_depfree_all <- semi_join(dfm_mod,depcut, by="study_id")
+  dfm_depfree_all <- semi_join(dfm_mod,depcut, by="unique_id")
   dfm_depfree<- filter(dfm_depfree_all, toggle==1)     
 
 # tidy
@@ -130,9 +141,12 @@ V <- quick_v(dfm_mod)
 Vhed <- quick_v(dfm_hed)
 Vtel <- quick_v(dfm_tel)
 Vhi <- quick_v(dfm_hi)
+Vlo <- quick_v(dfm_lo)
 Vmms <- quick_v(dfm_mmse)
 Varth <- quick_v(dfm_arthritis)
 Vfm  <- quick_v(dfm_fm_full)
+Vmsk <- quick_v(dfm_msk_full)
+Vhead <- quick_v(dfm_head_full)
 # Vmoc <- quick_v(dfm_moca) unneeded, no clusters
 Vmaincons <- quick_v(dfm_maincons)
 # Vcomp <- quick_v(dfm_test)
@@ -177,7 +191,7 @@ predict(simple.model)
 che.model <- rmvee(dfm_mod,vmat=V)
 che.ci <- confint(che.model)
 model.i2 <- var.comp(che.model)
-main_model_output <- predict(simple.model)
+main_model_output <- predict(che.model)
 rve.model <- robust(che.model, cluster=study_id, clubSandwich=TRUE) # substantially same as che.model
 
 
@@ -191,12 +205,17 @@ P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
 100 * res$tau2 / (res$tau2 + (res$k-res$p)/sum(diag(P))) ### total I^2
 100 * res.ci[[1]]$random[1,2:3] / (res.ci[[1]]$random[1,2:3] + (res$k-res$p)/sum(diag(P)))
 
+# High quality and low quality
 
 simple.hi <- rma(yi, vi, data=dfm_hi)
 confint(simple.hi)
 che.hi <- rmvee(dfm_hi,vmat=Vhi)
 hi.i2 <- var.comp(che.hi)
 
+simple.lo <- rma(yi, vi, data=dfm_lo)
+confint(simple.lo)
+che.lo <- rmvee(dfm_lo,vmat=Vlo)
+hi.i2 <- var.comp(che.lo)
 
 # che.hed <- rmvee(dfm_hed,vmat=Vhed)
 # che.tel <- rmvee(dfm_tel,vmat=Vtel)
@@ -232,6 +251,13 @@ che.arth <- rmvee(dfm_arthritis,vmat=Varth)
 simple.fm <- rma(yi,vi, data=dfm_fm_full)
 che.fm <- rmvee(dfm_fm_full,vmat=Vfm)
 
+simple.msk <- rma(yi,vi, data=dfm_msk_full)
+che.msk <- rmvee(dfm_msk_full,vmat=Vmsk)
+
+
+simple.head <- rma(yi,vi, data=dfm_head_full)
+che.head <- rmvee(dfm_head_full,vmat=Vhead)
+
 
 simple.dep <- rma(yi, vi, data=dfm_depfree)
 
@@ -264,16 +290,19 @@ che.model2 <- rma.mv(yi ~ cognitive_name -1,
 # ===========================
 
 
-che_names <- c("Total dataset", "Low risk of bias", "MMSE","Arthritis","Fibromyalgia")
-che_modellist <- vector(mode = "list", length = 5)
+che_names <- c("Total dataset", "Low risk of bias", "High risk of bias", "MMSE","Arthritis","Fibromyalgia", "MSK", "Headache")
+che_modellist <- vector(mode = "list", length = 8)
   che_modellist[[1]] <- che.model
   che_modellist[[2]] <- che.hi
-  che_modellist[[3]] <- che.mmse
-  che_modellist[[4]] <- che.arth
-  che_modellist[[5]] <- che.fm
-che_tablelist <- vector(mode = "list", length = 5)
+  che_modellist[[3]] <- che.lo
+  che_modellist[[4]] <- che.mmse
+  che_modellist[[5]] <- che.arth
+  che_modellist[[6]] <- che.fm
+  che_modellist[[7]] <- che.msk
+  che_modellist[[8]] <- che.head
+che_tablelist <- vector(mode = "list", length = 7)
 
-for (i in 1:5){
+for (i in 1:8){
 modelnow <-che_modellist[[i]]
 names <- che_names
 study_outputs <- predict(modelnow, digits=2)
@@ -282,7 +311,7 @@ presentable <- raw_overall %>%
   transmute(
     order = i,
     type = names[i],
-    method = "Multi-level approach",
+    method = "Multi-level",
     n = modelnow$k,
     justes =  pred,
     conf = paste0(pred, " [", ci.lb, " - ",  ci.ub,"]"),
@@ -298,18 +327,21 @@ bind_rows(che_tablelist)
 
 
 simp_names <-c(che_names, "MoCA", "Matched depression")
-simp_modellist <- vector(mode = "list", length = 7)
-simp_tablelist <- vector(mode = "list", length = 7)
+simp_modellist <- vector(mode = "list", length = 10)
+simp_tablelist <- vector(mode = "list", length = 10)
 simp_modellist[[1]] <- simple.model
 simp_modellist[[2]] <- simple.hi
-simp_modellist[[3]] <- simple.mmse
-simp_modellist[[4]] <- simple.arth
-simp_modellist[[5]] <- simple.fm
-simp_modellist[[6]] <- simple.moca
-simp_modellist[[7]] <- simple.dep
+simp_modellist[[3]]<- simple.lo
+simp_modellist[[4]] <- simple.mmse
+simp_modellist[[5]] <- simple.arth
+simp_modellist[[6]] <- simple.fm
+simp_modellist[[7]] <- simple.msk
+simp_modellist[[8]] <- simple.head
+simp_modellist[[9]] <- simple.moca
+simp_modellist[[10]] <- simple.dep
 
 
-for (i in 1:7){
+for (i in 1:10){
 modelnow <-simp_modellist[[i]]
 names <- simp_names
 study_outputs <- predict(modelnow, digits=2)
@@ -333,3 +365,6 @@ bind_rows(simp_tablelist)
 total_table <- bind_rows(che_tablelist,simp_tablelist)
 total_table <- total_table %>% arrange(order,method)
 total_table <- as.tibble(total_table)
+
+
+metacont(data=dfm_depfree,n_cont, cognitive_mean_cont, cognitive_sd_cont,n_treat, cognitive_mean_treat,cognitive_sd_treat, sm = "SMD")

@@ -1,4 +1,7 @@
 
+# NOW DEPRECATED _ SEE QUALINPROGRESS
+
+
 
 # =======================================
 # Forests and funnels

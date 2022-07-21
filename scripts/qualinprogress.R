@@ -3,7 +3,8 @@
 # FOREST PLOT
 # MAKE GOOD PDF
 
-
+forest(che.hi, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
+       showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
 
 # Simple
 plot.new()
@@ -42,7 +43,9 @@ forest(simple_moca, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE
 qualityset <- filter(quality_scores_vals, comp ==1)
 qualityset <- arrange(qualityset,study_id)
 slots <- sum(!is.na(qualityset$unique_id))
-
+qualityset <- qualityset %>%
+  mutate(Study = ifelse(toggle==1, paste0(Study,"*"),paste0(Study))) %>%
+  arrange(Study)
 
 
 

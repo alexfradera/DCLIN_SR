@@ -30,10 +30,6 @@ csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Co
 library(officedown)
 ```
 
-<!----
-```{r, child='SR_exec_summary.rmd'}
-```
---->
 
-```{r, child='SR_Report_Body.rmd'}
-```
+![Fig 1. PRISMA flow diagram](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/flowchart.jpg)
+![Fig 1. PRISMA flow diagram](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/flowchart.png)

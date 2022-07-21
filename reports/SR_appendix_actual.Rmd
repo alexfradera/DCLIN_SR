@@ -396,4 +396,17 @@ In terms of change over time, reduction in chronic pain levels was associated wi
 
 Noise places demands "on a limited capacity of attention and information processing, leaving less capacity available to the task at hand" [@Boman2004,p.448] which aligns with one account of how pain impacts cognition.
 
+
+# 4 more rve exploration
+
+
+
+resids_sav <- as_tibble(residuals(rve.model))
+ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
+  scale_x_continuous(breaks=NULL) +
+  theme(axis.title.x = element_blank()) + ylab("residuals - Sandwich")
+
+
 # References
+
+Strategies included a filter described in @ISSG2022 to exclude systematic reviews and age limiters where available. 

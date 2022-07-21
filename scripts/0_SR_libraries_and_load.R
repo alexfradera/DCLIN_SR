@@ -85,7 +85,7 @@ dfm2 <- dfm2 %>%
   mutate(sample_treat_cat = fct_recode(sample_treat_cat,
                                        "Fibromyalgia" = "FM",
                                         "Functional"  = "Somatisation",
-                                       "Functional" = "Phantom"
+                                       "Other" = "Phantom"
                                        ))
 
 # =================================

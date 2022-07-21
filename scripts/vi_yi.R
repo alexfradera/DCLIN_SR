@@ -42,7 +42,7 @@ dfm_e2 <-  escalc(measure="SMD",
                   m2i =cognitive_mean_treat ,    # mean of group 2
                   sd2i = cognitive_sd_treat,  # standard error of group 2
                   data = dfm_e1,
-                  vtype="AV") 
+                  vtype="LS") 
 
 ####################################
 #2  create effect sizes (SMD) using 'grand N'
