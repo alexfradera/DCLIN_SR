@@ -36,45 +36,29 @@ require("knitr")
  # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
 
 
- source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid2.R", echo = FALSE)
 
+ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
 
-# citation("metafor") etc
 
 ```
 
-
-```{r, diagnosis breakdown}
-#### Creation of table - move to appendix?
-
-levs = c("3","6","12","24","Not reported")
-minimum_onset <- dfm_mod %>%
-  mutate(minimum_months = ifelse(is.na(pain_onset_min), "Not reported", pain_onset_min),
-         minimum_months = factor(minimum_months, labels  = levs) )%>%
-        # ) %>%
-  group_by(minimum_months) %>%
-  summarise(n(),
-            average_years = sum(!is.na(pain_duration_mean))) 
-
-mintab <- flextable(minimum_onset)
-
-set_header_labels(mintab, 
-                  minimum_months = "min pain duration (months)",
-                                    `n()` = "n",
-                                    average_years = "n where mean condition/pain duration reported"
-                  )
-
-# Diagnoses are summarised in `r citest("diagnoses")`.
-
-```
-
+# Supplementary exploratory information
 
 ```{r, violins, echo=F}
 ggplot(dfm_mod, aes(x=1, y=yi)) + geom_violin() +
   scale_x_continuous(breaks=NULL) +
-  theme(axis.title.x = element_blank()) + ylab("effect size")
+  theme(axis.title.x = element_blank()) + ylab("effect size") + ggtitle("Violin plot of frequencies of effect sizes across dataset")
 ```
+```{r, mean_distro, echo = F}
+a2 <- dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_mean_treat, fill = cognitive_name)) + geom_histogram(binwidth = 2, alpha = 0.4)  + xlab("Pain groups") + theme(legend.position = "bottom") + xlim(10,100) +labs(fill ="Cognitive screen")
 
+
+a1 <- dfm2 %>%
+  ggplot(mapping = aes(x=cognitive_mean_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = 2, alpha = 0.4)  + xlab("Control groups")  + guides(fill = FALSE) + xlim(10,100) + ggtitle("Histogram of raw cognitive screen scores across dataset") 
+a1 / a2
+# , fill = "wheat", color = "black"
+```
 
 ```{r captions, include=FALSE, eval=TRUE}
 
@@ -126,106 +110,7 @@ sup_table_nums(name="diagnoses", caption = "")
 ```
 
 
-# Data overview
-**`r sup_figure_nums("just_testing")`
-```{r, diagnosis_table, echo= FALSE}
-cond_tab <- dfm2 %>%
-  group_by(sample_treat_cat, sample_treat) %>%
-  summarise(
-            count = n()
-                        )
-
-
-
-wide_conds <-cond_tab %>%
-pivot_wider( names_from = sample_treat_cat,
-                             values_from = count)
-
-conds_tab <- wide_conds %>%
-  mutate(across(everything(), ~ ifelse(!is.na(.), paste0(sample_treat," (", ., ")"
-                                                        ),""))) %>%
-  select(!sample_treat)
-
-library(officer)
-fd <- flextable(conds_tab)
-set_caption(fd, "Summary of diagnoses recorded for included studies")
-```
- 
-
-
-
-
-
-
-[*This table shows how `r sum(is.na(dfm_mod$pain_onset_min))` of comparisons did not provide an indication of minimum duration, either explicitly or via reference to a diagnosis that includes a minimum duration, and only a minority of these reported a mean duration of pain. For instance, rheumatoid arthritis is considered a chronic pain condition but the diagnostic criteria do not require a minimum period before a diagnosis is given]
-
-                  
-
-# put this outside the block to work <!---BLOCK_LANDSCAPE_START---> <!---BLOCK_LANDSCAPE_STOP--->
-# as per https://ardata-fr.github.io/officeverse/officedown-for-word.html#insert-sections
-
-
-# Approach
-Approach: one main analysis (possibly do a simple version under the hood and the more complex model just to check not wildly off) with every study. This can include measure type as a moderator.Then a sensitivity version dropping studies that you have a rationale to drop. And then possibly a few more sub-analyses, eg only those with similar depression scores – but may prefer to just inspect the data – eg order the forest plot by variables (eg categorical y/n depression)
-
-
-
-
-# Data checking
-```{r, mean_distro, echo = F}
-a1<- dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_mean_treat, fill = cognitive_name)) + geom_histogram(binwidth = 2, alpha = 0.4)  
-
-a2<- dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_sd_treat, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4) 
-
-a1/a2
-
-# , fill = "wheat", color = "black"
-```
-
-
-
-
-
-```{r, control_mean, echo = F}
-
-b1 <- dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_mean_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = 2, alpha = 0.4)  
-
-b2 <- dfm2 %>%
-  ggplot(mapping = aes(x=cognitive_sd_cont, fill = cognitive_name)) + geom_histogram(position = "identity", binwidth = .4, alpha = 0.4)  
-
-b1/b2
-
-```
- 
-
-
-
-
-
-# Initial raw model estimates
-
-A random effects model was fitted to the data and generated the below: 
-``` {r, simplemod, echo = F}
-simple <- rma(yi, vi, data=dfm_mod)
-
-
-simple
-
-
-```
-
-The summary information for this model (effect, s.e, confidence and prediction intervals are) 
-
-```{r, simpleout, echo = F}
-predict(simple, digits=2)
-```
-
-NB. For these and other models I am feeding in the es and variance thereof into the model for each comparison and it does the rest of the work. I can't see any explicit requests to enter in the sample sizes 
-
-# Presence of multiple comparisons
+# Approach to dealing with multiple comparisons
 
 Some studies offered more than one relevant comparison leading to extraction of multiple effect sizes in these cases. The table below summarises which studies provided multiple estimates.
 ``` {r, repeaters, echo = F}
@@ -243,26 +128,34 @@ wide_repeats2 <- wide_repeats %>%
 
 
 wide_repeats3 <- wide_repeats2 %>%
-  mutate(grouper = c(1,2,9,10,3,4,5,6,7,8,13,14,11,12,17,18,2.3,2.4)) %>%
-  arrange(grouper)
+  mutate(grouper = c(11, 12, 1, 2, 13, 14, 5, 6, 7, 8, 9, 10, 19, 20, 15, 16, 17, 18, 3, 4
 
 
-repeattab <- flextable(select(wide_repeats3, !grouper))
-repeattab <- set_table_properties(repeattab, layout = "autofit")
-repeattab
+
+)) %>%
+  arrange(grouper) %>% relocate(author_final, MMSE)
+
+
+
 
 authors <- (wide_repeats3$author_final)
 condition  <- (wide_repeats3$MMSE)
 
+
+repeattab <- flextable(select(wide_repeats3, !grouper))
+repeattab <- set_table_properties(repeattab, layout = "autofit")
+repeattab <- set_header_labels(repeattab, 
+                 author_final = "Authors")
+repeattab
+
 ```
 
-In (three) studies, multiple groups were compared against the same set of healthy controls: `r authors[1]` for `r condition[1]` and `r condition[2]`, and `r authors[3]` for `r condition[5]`, `r condition[3]` and `r condition[4]`. As the control group data was used repeatedly for these comparisons, the effect size estimates are correlated (due to the correlation of the sampling error of these estimates).
+In four studies, multiple groups were compared against the same set of healthy controls: `r authors[1]` for `r condition[1]` and `r condition[2]`, and `r authors[3]` for `r condition[3]`, and `r condition[4]`, with `r authors[5]` involving groups for `r condition[5]`,`r condition[6]` and `r condition[7]`. As the control group data was used repeatedly for these comparisons, the effect size estimates are correlated (due to the correlation of the sampling error of these estimates).
 
-In `r authors[3]` multiple  screens were taken, the  MMSE and Test Your Memory screens. The remaining multiple comparisons involved a single control group and patient group for both the MMSE and MoCA - `r authors[9]` `r authors[11]`.
+In addition, `r authors[5]` used multiple screens, the  MMSE and Test Your Memory. The remaining multiple comparisons involved a single control group and patient group for both the MMSE and MoCA - `r authors[11]` and `r authors[18]`.
 
-One further study, `r authors[13]` involved two separate pain groups each with a matched control group. The factor differentiating these pairs was a variable not relevant to this review (whether the individuals acted as caregivers) and the decision was made that this source of data would be better incorporated into the model as a single pair; accordingly these were merged using the functions below.
+One further study, `r authors[19]` involved two separate pain groups each with a matched control group. The factor differentiating these pairs was a variable not relevant to this review (whether the individuals acted as caregivers) and the decision was made that this source of data would be better incorporated into the model as a single pair; accordingly these were merged using the functions below.
 
-<!--- In one study results were given separately for one control-treatment group pairing and again for another, with no overlap between participants [@Terassi2021]; as the differences between groups were not material to the review (a care-giver pair and non-care-giver pair) the decision was made to merge together the two control groups and do the same for the two treatment groups. --->
 
 
 ``` {r, combining, echo = T}
@@ -273,140 +166,69 @@ sd_function <- function(m1,m2,s1,s2,n1=size1,n2=size2){
                          sqrt(((n1-1)*s1^2 + (n2-1)*s2^2 + n1 * n2 / (n1 + n2) * (m1^2 + m2^2 - 2 * m1 * m2)) / (n1 + n2 -1)) }
 ```
 
-# Correcting for multiple comparisons
+## Correcting for multiple comparisons
 
-[*NB the guidance I followed suggested that as part of preparing for this analysis, I should recalculate a grand N based on all groups within the study and use this to calculate variance - see https://www.metafor-project.org/doku.php/analyses:gleser2009, about half-way down under heading* **Quantitative response variables**: *"In addition, the total sample sizes of the individual studies are needed for further computations" etc. I am not sure of the rationale for this and cannot tell by reading up other examples whether the variances have been calculated in this way. Also using this version computes the effect sizes by hand using shared standard deviation measure and doing so I do not get quite identical scores: see below. es, yi and yiN are all effect sizes from different calculations, you can see that the effect size from the grand N is somewhat different from the other two. vi and viN are the two variance calculations, again they differ. This is more striking for the multiple comparison example (FAY089) but even the other ones are changed... which concerns me a little!*
 
-```{r, different_effects, echo = F}
-checkin <- dfm_e3 %>%
-select(study_id, n_cont,n_treat, Ni, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat,  es,yi, yiN,sdpi,  se, vi,viN)   %>%
+
+
+```{r, different_effects, eval = F, echo = F}
+# Computing effect sizes for two different approaches  - from esc function (es) and metafor(yi) - very very similar.
+
+checkin <- dfm_mod %>%
+select(study_id, n_cont,n_treat, cognitive_mean_cont, cognitive_mean_treat, cognitive_sd_cont, cognitive_sd_treat,  es,yi)   %>%
   slice(11:19)
 
-flextable(checkin)
+flextable(checkin) %>%
+  colformat_double(digits=4, j = (8:9) )
 
 ```
-[*NB this is the code I have used to create this. the viN one seems strange to me - missing a bracket? But I have copied the reference in the above link and can't find guidance on any other way to do this....*]
 
-```{r, echo=TRUE}
-dfm_e3 <- dfm_e3 %>%
-  mutate(
-    sdpi = sqrt(((n_cont-1)*cognitive_sd_cont^2 + (n_treat-1)*cognitive_sd_treat^2) / (n_cont+n_treat-2)),
-    yiN  = (cognitive_mean_cont-cognitive_mean_treat)/sdpi,
-    viN = 1/n_cont+ 1/n_treat + yi^2/(2*Ni)
-  )
-```
-
-*so I have been using a variant of*]
-
-A correlation matrix was produced based on published relationships between cognitive screens: MoCA with MMSE [@Nasreddine2005], MMSE with ACE (ACE-III) [@MatiasGuiu2017], MMSE with TYM [@Zande2017]. Other relationships were estimated but are not actually required as these relationships are not relevant for these studies.
+To deal with this a Correlated Hierarchical Effects (CHE) model was utilised. As part of this workflow, a variance-covariance matrix was computed across all the comparisons (dimensions `r length(unique(dfm_mod$unique_id))` * `r length(unique(dfm_mod$unique_id))`) using the vcalc() function from the *metafor* package. In such a matrix, the diagonal (identity) composed of the sampling variance of each study (eg, element [6,6] would contain the sampling variance for comparison 6). If that comparison is unrelated to others, only this element will be used to stand-in for the  study sampling variance (meaning the study sampling variance remains the study sampling variance). When groups are related the vcalc() process will produce covariance estimates of the two (sampling variances) at the appropriate positions (e.g., if studies 7 and 8 share a control group, matrix elements [7,8] and [8,7] will incorporate these covariance estimates). This is further shaped by a correlation matrix based on published relationships between cognitive screens: MoCA with MMSE [@Nasreddine2005], MMSE with ACE (ACE-III) [@MatiasGuiu2017], MMSE with TYM [@Zande2017]. Other relationships were estimated but are not actually required as these relationships are not relevant for these studies. 
 
 ```{r, callingR, echo = F}
 R
 ```
 
+For eg Liao et al. (2018), with one MMSE and one MoCA comparison on identical groups, the matrix elements are:
 
-
-# Other Interaction effects?
-
-There is a lot more that could be looked at, I will continue to explore but here are some thoughts.
-Beyond these there are things such as type of pain category, gender ratio (pooled across control and treatment?), education matching, age diffs...
-
-One major one I realised I wanted to do was subsetting those studies without exclusions by cognitive screen cut-off - I've just run out of time at this point is all.
-
-## Pain
-
-NB I've started to incorporate pain into the main report.
-There are a wide range of measures taken as shown below. Measures have been presented as negative when higher scores represent better health/lower pain.
-
-```{r pain_measures, echo=F}
-dfm_mod %>%
-  group_by(pain_measure) %>%
-  summarise(
-            mean = mean(pain_mean_treat, na.rm = TRUE),
-            count = n()
-                        )
+```{r, cov}
+ V[dfm_mod$study_num == 121, dfm_mod$study_num == 121]
 ```
 
-This uses raw pain scores of the patient group (not differences, as the data for controls is rare). Effect sizes are greater as ratings on a visual analogue scale (VAS) go up. But scores on the SF-MPQ show a different direction...
+and the underlying correlation matrix is, as expected, 
+```{r, cor}
+ cov2cor(V[dfm_mod$study_num == 121, dfm_mod$study_num == 121])
+```
 
-``` {r, pain, echo = F}
-dfm_mod %>%
-  mutate(
-    sta_pain = ifelse(pain_measure == "PVAS (0-100)", (pain_mean_treat*.1)/(pain_sd_treat*.1), pain_mean_treat/pain_sd_treat),
-    raw_pain = ifelse(pain_measure == "PVAS (0-100)", (pain_mean_treat*.1), pain_mean_treat)) %>%
-  group_by(pain_measure) %>%
-  filter(n()>2) %>%
-  ggplot(mapping = aes(x=raw_pain,y=yi, colour =pain_measure)) + geom_point() + stat_smooth(method=lm, se= FALSE)
+Model calculation then draws on this V matrix to inform the final weighting of comparisons; the effect is a downweighting of estimates from studies with multiple comparisons. See the comparable process documented at https://wviechtb.github.io/metadat/reference/dat.knapp2017.html. Results from this process are reported in the the results of chapter 1.
+
+# RVE calculation
+
+
+An additional model was conducted using a robust variation estimation (RVE) approach introduced as a final step to the CHE workflow described above. This introduces a Sandwich estimator that can be superior in estimating standard errors and thus the confidence intervals around derived effects. This can be beneficial in clustered datasets particularly when the number of clusters is small. In our case, the model outputs were almost identical to the original multi-level approach, and was therefore not pursued further.
+
+*Original approach:*
+
+```{r che}
+che.model
 
 ```
 
-I have started to incorporate this into the model
+*RVE approach:*
 
-## Medication status
+```{r vsrve}
 
-Only mconf[[2,2]] studies controlled adequately for medication. 
-I ran a separate analysis for this group and it came out with a significantly higher estimate. however this also includes studies that were not well-controlled for education and age
-
-```{r, meds_cont, echo = F}
-che.model_medscon
+rve.model
 ```
 
 
-If I also control for these, we get even bigger estimates but for a really small dataset:
 
-```{r allcon, echo = F}
-che.model_allcon
-
-```
-
-And it then gets quite difficult to do things like look at moderators (eg absolute age of patients or pain diffs). I have got quite full up with different versions of models and think I need to stop and take a step back!
-
-
-
-# check residuals
-# resids_che <- as.tibble(rstudent(che.model)$resid)
-# ggplot(data = resids_che, mapping = aes(x=1, y=value)) + geom_violin() +
-#  scale_x_continuous(breaks=NULL) +
-#  theme(axis.title.x = element_blank()) + ylab("residuals - CHE")
-
-
-# # raw calculate heterogeneity
-# # res.R <- che.model
-# # res.F <- che.model
-# 
-# c(100 * (vcov(res.R)[1,1] - vcov(res.F)[1,1]) / vcov(res.R)[1,1],
-#   100 * (vcov(res.R)[2,2] - vcov(res.F)[2,2]) / vcov(res.R)[2,2])
-
-#W <- solve(V)
-# X <- model.matrix(che.modelX)
-# P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-# 100 * res$tau2 / (res$tau2 + (res$k-res$p)/sum(diag(P)))
-
-Cognitive screen score standard mean differences within the dataset ranged from `r round(min(dfm_mod$yiN),2)` to `r round(max(dfm_mod$yiN),2)` as shown in the histogram below.
-
-``` {r, histos, echo = F}
-#dfm_mod %>%
-#  ggplot(mapping = aes(x=yi)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
-
-dfm_mod %>%
-  ggplot(mapping = aes(x=yi)) + geom_histogram(binwidth = .2, fill = "wheat", color = "black")  + xlab("Standardised Mean Difference")
-```
-
-In terms of change over time, reduction in chronic pain levels was associated with improvement in MoCA performance in @Bernardi2021[, however note a small sample], but not in @Alemanno2019, despite improvements observed on some other neuropsychological measures.
-
-Noise places demands "on a limited capacity of attention and information processing, leaving less capacity available to the task at hand" [@Boman2004,p.448] which aligns with one account of how pain impacts cognition.
-
-
-# 4 more rve exploration
-
-
-
+``` {r rveresids, eval = F, echo =F}
 resids_sav <- as_tibble(residuals(rve.model))
 ggplot(data = resids_sav, mapping = aes(x=1, y=value)) + geom_violin() +
   scale_x_continuous(breaks=NULL) +
-  theme(axis.title.x = element_blank()) + ylab("residuals - Sandwich")
-
+  theme(axis.title.x = element_blank()) + ylab("residuals")
+```
 
 # References
 
-Strategies included a filter described in @ISSG2022 to exclude systematic reviews and age limiters where available. 
