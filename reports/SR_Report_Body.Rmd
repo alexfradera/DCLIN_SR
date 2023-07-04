@@ -1,56 +1,139 @@
 ---
-title: "Does the presence of chronic pain affect scores on cognitive screening tests/brief cognitive measures? A Systematic Review"
-author: "2509920F"
-date: ""
-output: 
-  officedown::rdocx_document:
-     reference_docx: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_Template.docx'
-     tables:
-      style: Table
-      layout: autofit
-      width: 1.0
-      caption:
-       style: Table Caption
-       pre: 'Table '
-       sep: ': '
-      conditional:
-       first_row: true
-       first_column: false
-       last_row: false
-       last_column: false
-       no_hband: false
-       no_vband: true
-bibliography: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/SR_biblio.bib'
-csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/apa-6th-edition.csl'
-#csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/psychological-medicine.csl'
-#csl: 'C:/Users/Alexander Fradera/OneDrive - University of Glasgow/non-dclin/5_Code/R library/csl/neuropsychology.csl'
+title             : "Does the presence of chronic pain affect scores on cognitive screening tests/brief cognitive measures? A Systematic Review"
+shorttitle        : "Title"
+
+author: 
+  - name          : "Alex Fradera"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "School of Health & Wellbeing, College of Medical, Veterinary and Life Sciences, University of Glasgow, Clarice Pears Building, 90 Byres Road, Glasgow, G12 8TB"
+    email         : "alexander.fradera@glasgow.ac.uk"
+    role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
+      - "Conceptualization"
+      - "Data curation"
+      - "Formal analysis"
+      - "Investigation"
+      - "Methodology"
+      - "Project administration"
+      - "Software"
+      - "Visualisation"
+      - "Writing - Original Draft Preparation"
+      - "Writing - Review & Editing"
+  - name          : "Jessica McLaren"
+    affiliation   : "2"
+    role:
+      - "Investigation"
+      - "Methodology"
+      - "Writing - Review & Editing"
+      
+  - name          : "Lisa Gadon"
+    affiliation   : "3"
+    role:
+      - "Conceptualization"
+      - "Methodology"
+      - "Writing - Review & Editing"
+      
+  - name          : "Breda Cullen"
+    affiliation   : "1"
+    role:
+      - "Conceptualization"
+      - "Methodology"
+      - "Writing - Review & Editing"
+
+      
+  - name          : "Jonathan Evans"
+    affiliation   : "1"
+    role:
+      - "Conceptualization"
+      - "Methodology"
+      - "Writing - Review & Editing"
+
+affiliation:
+  - id            : "1"
+    institution   : "University of Glasgow"
+  - id            : "2"
+    institution   : "NHS Ayrshire and Arran"
+  - id            : "3"
+    institution   : "NHS Greater Glasgow and Clyde"
+
+authornote: |
+
+
+abstract:   "(ref:abstract)"
+
+
+  
+keywords          : "dementia, pain, cognition, cognitive screen, meta-analysis"
+wordcount         : "X"
+
+bibliography      : '../SR_biblio.bib'
+
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no  #yes
+
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+
+# classoption       : "man"
+classoption       : "man, donotrepeattitle"
+header-includes:
+  - |
+    \makeatletter
+    \renewcommand{\paragraph}{\@startsection{paragraph}{4}{\parindent}%
+      {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+      {-1em}%
+      {\normalfont\normalsize\bfseries\typesectitle}}
+    
+    \renewcommand{\subparagraph}[1]{\@startsection{subparagraph}{5}{1em}%
+      {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+      {-\z@\relax}%
+      {\normalfont\normalsize\bfseries\itshape\hspace{\parindent}{#1}\textit{\addperi}}{\relax}}
+    \makeatother
+  - \usepackage{setspace}
+  - \AtBeginEnvironment{tabular}{\singlespacing}
+  - \AtBeginEnvironment{lltable}{\singlespacing}
+  - \AtBeginEnvironment{tablenotes}{\doublespacing}
+  - \captionsetup[table]{font={stretch=1.5}}
+  - \captionsetup[figure]{font={stretch=1.5}}
+
+csl               : "`r system.file('rmd', 'apa7.csl', package = 'papaja')`"
+documentclass     : "apa7"
+# output            : papaja::apa6_pdf
+output            : papaja::apa6_word
 ---
+# Public significance statement
+This systematic review assesses whether experiencing chronic pain may lead to poorer scores on dementia screening instruments. Data from over 50 studies suggests that across a range of conditions, scores tended to be worse when people were living with pain. This can inform use of these tests when chronic pain is present, which can be common in later life.
 
+\newpage
 
-
-```{r include=FALSE}
+```{r setup, include = FALSE}
+library("papaja")
 library(officedown)
-```
-
-```{r, setup, include=FALSE}
+library(here)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 require("knitr")
 # opts_knit$set(root.dir = "..") #  I put this in to raise up the working directory from the reports folder (where the rmd lives) to one level above
 ```
 
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+
 
 ```{r, launch_scripts, echo=FALSE, fig.show='hide', include=TRUE, warning=FALSE}
 # This is the cleaning and pre-processing described above.
-# source("./scripts/SBEP_staff_script_q3.R", print.eval = FALSE, echo = TRUE, keep.source = TRUE)
- # source("./scripts/0_SR_libraries_and_load.R", echo = FALSE)
 
+source(here('scripts', 'model_making.R')) 
 
- source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\model_making.R", echo = FALSE)
-
-
-# citation("metafor") etc
 
 ```
+
 
 ```{r captions, include=FALSE, eval=TRUE}
 library(captioner)
@@ -71,13 +154,7 @@ sup_table_nums(name="diagnoses", caption = "Summary of diagnoses recorded for in
 
 ```
 
-
-
-# Abstract
-
-Chronic pain is increasingly prevalent with age and impairs cognitive function, but it is not known if it can affect performance on cognitive screening tests commonly used to detect dementia. This systematic review and meta-analysis (SR/MA) aimed to assess this question. PRISMA guidelines were followed. Studies were included with participants age >18 with a pain-free control group and at least one chronic-pain group defined as self-reported pain lasting >3 months or a diagnosis included in lists curated by the  International Association for the Study of Pain. Embase (Ovid), Medline, PsycINFO (September 2021) and OpenGrey (January 2021) were searched. Risk of bias was assessed using the Joanna Briggs Critical Appraisal Checklist for Cross-Sectional Studies. Due to clustering of effects (multiple effects extracted from studies) a random effects multilevel modelling approach was used to calculate Hedges' g with positive g reflecting impairment in the chronic pain group. The `r length(unique(dfm_mod$study_id))` studies identified yielded `r length(unique(dfm_mod$unique_id))` effect size estimates. The pooled g was `r format(round(main_model_output $pred, 2), nsmall = 2)` [95% confidence interval `r format(round(main_model_output $ci.lb, 2), nsmall = 2)` to `r format(round(main_model_output $ci.ub, 2), nsmall = 2)`]. Heterogeneity was high for the full model ($I^2$ = `r round(model.i2$totalI2,2)`%) with some reductions in sub-analyses. Around half of studies were identified as being at a low risk of bias. There was no evidence of publication bias. Study bias factors limit interpretation of the findings as a whole, but sub-analyses suggest real effects exist within different pain conditions, for different screening measures, and that pain should be considered when cognitive screens are employed.
-
-
+(ref:abstract) Cognitive screening tests can identify potential dementia by indicating a concerning level of cognitive impairment. The older populations for whom this is most relevant are more likely to experience chronic pain, which also impairs cognitive function, but pain's impact on cognitive screening tests specifically remains unknown. We conducted a systematic review and meta-analysis (SR/MA) following PRISMA guidelines evaluating cognitive screening scores in studies involving participants with chronic pain compared with a pain-free control group. Our question was whether the presence of chronic pain (self-reported or based on diagnosis) was associated with poorer performance on these screens, and to identify the heterogeneity across groups and screens. The `r length(unique(dfm_mod$study_id))` studies identified yielded `r length(unique(dfm_mod$unique_id))` effect size estimates. The pooled g was `r format(round(main_model_output $pred, 2), nsmall = 2)` [95% confidence interval `r format(round(main_model_output $ci.lb, 2), nsmall = 2)` to `r format(round(main_model_output $ci.ub, 2), nsmall = 2)`]. Heterogeneity was high for the full model ($I^2$ = `r round(model.i2$totalI2,2)`%)  with some reductions in sub-analyses. Around half of studies were identified as being at a low risk of bias. There was no evidence of publication bias. As a whole, this analysis suggests medium to large effect sizes for pain on cognitive screen performance. We suggest that clinicians should consider the effect of pain when cognitive screens are employed, and the need to clarify the effect pain has on different screen components to aid their effective use with these populations.
 
 # Introduction
 ## Rationale
@@ -85,18 +162,18 @@ Chronic pain is increasingly prevalent with age and impairs cognitive function, 
 Cognitive screening tools are measures designed to detect cognitive impairment through brief means, typically within 20 minutes [@Cullen2007]. These target either one highly predictive ability or core domains (e.g. language, memory, attention) using a minimal set of items. While cognitive screening is used for many conditions such as brain tumors, psychiatric disorders, and traumatic brain injuries [@RoebuckSpencer2017], a common rationale for their development is to screen for dementia. 
 
 
-In some instances low cognitive screen scores that corroborate deficits reported at clinical interview may help clinicians reach a diagnosis. Screening scores also aid in determining the need for more in-depth assessment, which is typically time-intensive and cognitively demanding. Cognitive screens should thus be sufficiently sensitive - correctly identifying when followup is warranted, to maximise early diagnosis - and specific - avoiding putting people onto an unnecessary investigative pathway [@Cullen2007].
+In some instances low cognitive screen scores that corroborate deficits reported at clinical interview may help clinicians reach a diagnosis. Screening scores also aid in determining the need for more in-depth assessment, which is typically time-intensive and cognitively demanding. Cognitive screens should thus be sufficiently sensitive - correctly identifying when follow-up is warranted, to maximize early diagnosis - and specific - avoiding putting people onto an unnecessary investigative pathway [@Cullen2007].
 
 Key to diagnostic accuracy is understanding how other factors may influence screen performance. For instance, while the screening measure Addenbrooke's Cognitive Examination-III (ACE-III) appears reasonably robust to levels of premorbid intelligence of the test-taker [@Stott2017], other frequently used screens such as the Mini-Mental State Examination (MMSE) and Montreal Cognitive Assessment (MoCA) show an influence of intelligence [@Alves2013], leading those researchers to recommend premorbid IQ scores be considered alongside the test results. Environmental factors have also been noted as influential, with @Dupuis2016 reporting a three-point decrement on the MoCA when completing the measure under noisy conditions. Accuracy concerns also apply to populations with co-morbid conditions that may affect cognition, such as chronic pain. 
 
-When someone experiences chronic pain they are more likely to report problems with memory, attention or thinking [@McCracken2001]. Pain is known to affect performance on neuropsychological tests and batteries, on domains including attention, speed of information processing and executive function, as described by @Moriarty2011. 
+When someone experiences chronic pain they are more likely to report problems with memory, attention and thinking [@McCracken2001]. Pain is known to affect performance on neuropsychological tests and batteries, on domains including attention, speed of information processing and executive function, as described by @Moriarty2011. 
 
-These authors note that potential mechanisms behind this performance impact include resource depletion and disrupted attention due to pain symptoms; for chronic pain, further possibilities are concomitant analgesic use and longer-term neurological changes due to the pain condition or sustained experience of pain. As chronic pain is more prevalent with aging [@Schofield2007], it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen performance.
+These authors note that potential mechanisms driving this impairment include resource depletion and disrupted attention due to pain symptoms; for chronic pain, further possibilities are concomitant analgesic use and longer-term neurological changes due to the pain condition or sustained experience of pain. As chronic pain is more prevalent with aging [@Schofield2007], it is important to understand whether the experience impacts cognition sufficiently to result in alterations of cognitive screen performance.
 
 
-Further reviews provide more detail on the impact of chronic pain on aspects of cognition. Meta-analyses of performance in working memory  are described by  @Berryman2013 and in executive function by @Berryman2014. For rheumatoid arthritis specifically, @Pankowski2022 present meta-analyses showing cognitive impairment across several domains, and  @Meade2018 note impairments particularly in memory, attention and verbal function. A review of fibromyalgia by @SchmidtWilcke2010 summarises problems in free recall, working memory and a mixed pattern of results around attention. 
+Further reviews provide more detail on the impact of chronic pain on aspects of cognition. Meta-analyses of performance in working memory  are described by  @Berryman2013 and in executive function by @Berryman2014. For rheumatoid arthritis specifically, @Pankowski2022 present meta-analyses showing cognitive impairment across several domains, and  @Meade2018 note impairments particularly in memory, attention and verbal function. A review of fibromyalgia by @SchmidtWilcke2010 summarizes problems in free recall, working memory and a mixed pattern of results around attention. 
 
-In the main these studies do not focus on cognitive screening tools. The primary exception is @Pankowski2022 which reports estimated effect sizes for two such measures, the MMSE (based on eight comparisons) and the MoCA (based on three comparisons), finding respective standardised mean differences of .66 [95% CI 0.42- 0.90] and 1.27 [95% CI 0.68-1.87]. This suggests pain conditions may be associated with poorer cognitive screen performance. However, this may not generalise to other conditions, especially as other mechanisms for cognitive impairment are suspected for rheumatoid arthritis [such as impact on intracranial circulation, see e.g. @Olah2017].
+In the main these studies do not focus on cognitive screening tools. The primary exception is @Pankowski2022 which reports estimated effect sizes for two such measures, the MMSE (based on eight comparisons) and the MoCA (based on three comparisons), finding respective standardized mean differences of .66 [95% CI 0.42- 0.90] and 1.27 [95% CI 0.68-1.87]. This suggests pain conditions may be associated with poorer cognitive screen performance. However, this may not generalize to other conditions, especially as other mechanisms for cognitive impairment are suspected for rheumatoid arthritis [such as impact on intracranial circulation, see e.g. @Olah2017].
 
 
 ## Objectives
@@ -112,7 +189,7 @@ The study followed the PRISMA guidelines for reporting SRs and MAs [@Moher2009].
 
 The review focused on primary research that satisfied a set of PECO criteria - (P)opulation, (E)xposure, (C)omparator, (O)utcomes - defined as follows: in (P) participants of any sex aged 18 or over investigate (E) the effect of having chronic pain versus (C) controls without chronic pain  on (O) cognitive screening tool performance. Studies could include cross-sectional as well as experimental designs unless the available screening data was confounded by an introduced treatment. Studies were excluded if they involved samples with a diagnosed cognitive impairment due to a disease originating in the brain, such as stroke, traumatic brain injury or dementia.
 
-Definitions of cognitive screening tools are varied and are the subject of a number of previous systematic reviews [e.g. @Ashford2008; @Cullen2007]. This SR utilised a practitioner definition provided by the @AlzheimersSociety2013 which reports nine screens agreed by UK clinicians to be appropriate for common clinical practice, being: Addenbrooke's Cognitive Examination-III (ACE-III), Abbreviated Mental Test (AMT), Mini-Cog, Montreal Cognitive Assessment (MoCA), Mini Mental State Examination (MMSE), 6-item Cognitive Impairment Test (6CIT), Hopkins Verbal Learning Test (HVLT), Test for the Early Detection of Dementia (TE4D-Cog), and Test Your Memory test (TYM). Studies using different editions and language variants of these screens were eligible. 
+Definitions of cognitive screening tools are varied and are the subject of a number of previous systematic reviews [e.g. @Ashford2008; @Cullen2007]. This SR utilized a practitioner definition provided by the @AlzheimersSociety2013 which reports nine screens agreed by UK clinicians to be appropriate for common clinical practice, being: Addenbrooke's Cognitive Examination-III (ACE-III), Abbreviated Mental Test (AMT), Mini-Cog, Montreal Cognitive Assessment (MoCA), Mini Mental State Examination (MMSE), 6-item Cognitive Impairment Test (6CIT), Hopkins Verbal Learning Test (HVLT), Test for the Early Detection of Dementia (TE4D-Cog), and Test Your Memory test (TYM). Studies using different editions and language variants of these screens were eligible. 
 
 
 ## Information sources
@@ -123,7 +200,7 @@ Searches of bibliographic databases were conducted on 17th September 2021 via: O
 
 ## Search strategy
 
-Database searches were designed using the PECO model described above.  Exposure was operationalised in title and abstract by identification of key pain-related conditions (fibromyalgia, arthritic and rheumatic conditions), chronic adj/5 pain or headache/migraine, or report of a standardised pain measure (e.g. McGill Pain Questionnaire); where available medical headers for pain were used. Population was defined by use of Medical Headers. Outcome was operationalised by full names and abbreviations of the nine cognitive measures in title and abstract and where available tests and measures fields. No comparator information was used to define the search parameters. Searches were initially piloted in PsychINFO before adaptation for use in the other databases. Full search strategies for each database can be found in Appendix 1. 
+Database searches were designed using the PECO model described above.  Exposure was operationalized in title and abstract by identification of key pain-related conditions (fibromyalgia, arthritic and rheumatic conditions), chronic adj/5 pain or headache/migraine, or report of a standardized pain measure (e.g. McGill Pain Questionnaire); where available medical headers for pain were used. Population was defined by use of Medical Headers. Outcome was operationalized by full names and abbreviations of the nine cognitive measures in title and abstract and where available tests and measures fields. No comparator information was used to define the search parameters. Searches were initially piloted in PsychINFO before adaptation for use in the other databases. Full search strategies for each database can be found in Appendix 1. 
 
 Hand-searches were made prior to search  to identify relevant studies that met criteria, using keywords and reviews identified by searching Epistimonikos and PROSPERO. Further studies were identified through a review article discovered subsequent to search completion. Due to the number of final studies obtained back- or forward-citation searches were deemed unnecessary.
 
@@ -146,9 +223,9 @@ Study quality was assessed using the JBI Critical Appraisal Checklist for Analyt
 
 ## Statistical analyses  - effect measures and synthesis
 
-Cognitive screen means and standard deviations were used to compute standardised mean differences (SMD) in the form of Hedge's g using the approach described by @Hedges1985. Scores reflect the size of effect due to pain status with larger positive scores reflecting greater impairment in the chronic pain group. Where data was presented as median and inter-quartile range, this was converted into estimated mean and standard deviation with the *estmeansd* R package using the Box–Cox method described in @McGrath2020. 
+Cognitive screen means and standard deviations were used to compute standardized mean differences (SMD) in the form of Hedges' g using the approach described by @Hedges1985. Scores reflect the size of effect due to pain status with larger positive scores reflecting greater impairment in the chronic pain group. Where data was presented as median and inter-quartile range, this was converted into estimated mean and standard deviation with the *estmeansd* R package using the Box–Cox method described in @McGrath2020. 
 
-Analyses were conducted using the *metafor* package [@Viechtbauer2010] with a random-effects model using restricted maximum-likelihood (REML) estimation to measure between-study variance and producing a Wald-type confidence interval. Individual and aggregated effect sizes were visualised using forest plots. A multi-level meta-analytic approach was taken as for a number of studies  more than one comparison of cognitive screen scores fit  review criteria (due either to multiple chronic pain groups compared to one control group or two cognitive screens administered across participants). In most instances this led to generating multiple standardised mean differences per study^[In one case, it was judged that groups could be more appropriately merged to produce a single standardised mean difference.]. This produces interdependency between outcomes, which was addressed by a multi-level approach to pooling data. This involved a correlated and hierarchical effects model which drew on a covariance matrix estimating these interdependencies, incorporating information about the relationships between cognitive screen scores.  We also explored whether results differed when employing robust variance estimation methods to further account for non-independence. Details are provided in Appendix 4. Two types of sub-group analysis were considered: those focusing on data from a single cognitive screening measure, and those involving data from a single pain condition. These analyses were attempted for situations where five or more comparisons were available. Analysis code is available at https://osf.io/hwa4j/.
+Analyses were conducted using the *metafor* package [@Viechtbauer2010] with a random-effects model using restricted maximum-likelihood (REML) estimation to measure between-study variance and producing a Wald-type confidence interval. Individual and aggregated effect sizes were visualized using forest plots. A multi-level meta-analytic approach was taken as for a number of studies  more than one comparison of cognitive screen scores fit  review criteria (due either to multiple chronic pain groups compared to one control group or two cognitive screens administered across participants). In most instances this led to generating multiple standardized mean differences per study^[In one case, it was judged that groups could be more appropriately merged to produce a single standardized mean difference.]. This produces interdependency between outcomes, which was addressed by a multi-level approach to pooling data. This involved a correlated and hierarchical effects model which drew on a covariance matrix estimating these interdependencies, incorporating information about the relationships between cognitive screen scores.  We also explored whether results differed when employing robust variance estimation methods to further account for non-independence. Details are provided in Appendix 4. Two types of sub-group analysis were considered: those focusing on data from a single cognitive screening measure, and those involving data from a single pain condition. These analyses were attempted for situations where five or more comparisons were available. Analysis code is available at https://osf.io/hwa4j/.
 
 ## Reporting bias assessment
 
@@ -202,7 +279,7 @@ toggles <- quality_scores_vals %>% count(toggle)
 
 Only three comparisons (from two studies) met every JBI criterion. The majority of comparisons (k =`r inclusiondesc[3,2]`) did adequately describe sample details and inclusion criteria as per criterion 1 and 2. However the majority of comparisons  failed to meet either criteria 3 (k = `r painrep[1,2]`) or 5 (k =`r confoundrep[1,2]`) due respectively to lack of pain measurement in both control and pain groups and non-reporting of mood, education, age or medication information. Half of comparisons (k = `r confoundcont[1,2]`)  failed to control for education and age (criterion 6) and around half  (k = `r cogreport[1,2]`)  failed to provide information about administration of the cognitive screen (criterion 7). Finally `r cogcutoff[1,2]` studies showed bias on criterion 8, involving a floor on screening scores due to exclusion of low-scoring participants^[In most cases the cut-off employed (e.g. MMSE 24 or 28) fell within a 68% coverage interval of scores observed within our datasets; we exempted two cases where the threshold was very low and well outside this (e.g. MMSE 10 or 14) which removed only the severely cognitively impaired as part of exclusion criteria.]. 
 
-As the appraisal tool does not provide guidance as to how to categorise studies as high or low risk of bias, we reviewed the likely impact of bias on each criterion upon and determined that for this SR, studies with low risk of bias were those meeting these key criteria: 
+As the appraisal tool does not provide guidance as to how to categorize studies as high or low risk of bias, we reviewed the likely impact of bias on each criterion upon and determined that for this SR, studies with low risk of bias were those meeting these key criteria: 
 
 - adequate exclusion criteria (J1)
 - controlled or matched for age and education (J6)
@@ -237,17 +314,26 @@ A simple random effects model produced a higher pooled SMD estimate, suggesting 
 
 ## Reporting biases
 
-Fig 4 shows a funnel plot including studies where the cognitive screen was key to the study purpose. This uses the trim-and-fill method [@Duval2000] to interpolate study effect sizes that would be expected from the extracted results, suggesting where low-powered and non-significant effects may be absent from the distribution. The plot suggests that no additional low-powered, non-significant effects would be expected given the observed distribution, providing no evidence of reporting biases. 
 
 
+``` {r eggrs}
+ dfm_key<- dfm_mod %>%
+    filter(cognitive_focus == "key")
+res_key <- rma(yi, vi, data=dfm_key)
+eggers<- regtest(res_key, model="rma",  ret.fit=FALSE, digits = 2)
+
+test <- rma(yi,vi, data= dfm_mod)
+
+```
 
 
+Fig 4 shows a funnel plot including studies where the cognitive screen was key to the study purpose. This uses the trim-and-fill method [@Duval2000] to interpolate study effect sizes that would be expected from the extracted results, suggesting where low-powered and non-significant effects may be absent from the distribution. The plot suggests that no additional low-powered, non-significant effects would be expected given the observed distribution. The Egger test was conducted which seeks to identify a relationship between effect size and precision of estimate that may indicate systematic publication bias. The estimated coefficient was `r round(eggers$zval,2)`, p = `r  round(eggers$pval,2)`, meaning the test cannot reject the null of no such relationship.
 
 # Discussion
 
 ## Summary of findings
 
-There appears to be considerable evidence for chronic pain being associated with lower scores on cognitive screens. For every analysis and sub-analysis, the 95% coverage interval did not include zero, suggesting that across diverse groups experiencing chronic pain, cognitive screen performance is lower than for control groups - even when low mood, which frequently co-occurs with pain, is similar across groups. However, the high levels of heterogeneity suggest that the sources of this effect may be manifold. Sub-analyses on the two most represented screens (MMSE and MoCA) saw some reduction of heterogeneity, and saw larger effect sizes for the MoCA, suggesting that the screens may be differentially affected by chronic pain. The overall estimate for low risk of bias studies was `r round(predict(che.hi)$pred,3)` (95% CI `r round(che.hi$ci.lb, 3)` - `r round(che.hi$ci.ub, 3)`).
+There appears to be considerable evidence for chronic pain being associated with lower scores on cognitive screens. For every analysis and sub-analysis, the 95% coverage interval did not include zero, suggesting that across diverse groups experiencing chronic pain, cognitive screen performance is lower than for control groups - even when low mood, which frequently co-occurs with pain, is similar across groups. However, the high levels of heterogeneity suggest that the sources of this effect may be manifold. Sub-analyses on the two most represented screens (MMSE and MoCA) saw some reduction of heterogeneity with larger effect sizes for comparisons involving the MoCA. The overall estimate for low risk of bias studies was `r round(predict(che.hi)$pred,3)` (95% CI `r round(che.hi$ci.lb, 3)` - `r round(che.hi$ci.ub, 3)`).
 
 Different pain conditions yielded slightly different pooled effects. 
 The highest overall effect was for chronic headache/migraine sufferers; however this effect had the 95% coverage interval which came closest to including zero. Fibromyalgia studies followed a similar pattern: a large point estimates with a wide confidence interval. The MSK group saw smaller effect sizes within again a wide confidence interval. Note that these analyses included studies at a high risk of bias, which as a whole produced higher point estimates and wider coverage intervals than studies with a low risk of bias. Studies (limited to low risk of bias) on arthritis  demonstrated more consistency and an intermediate point estimate. We also note that the two studies [@Karp2008; @Terassi2021] explicitly limited to older adults (with low risk of bias) reported two of the three^[with @Torkamani2015.] smallest SMDs.
@@ -263,8 +349,7 @@ Inflammatory diseases are increasingly understood to have neurological implicati
 
 ### Cognitive scores
 
-The larger effect sizes for the MoCA versus MMSE mirror that found by @Pankowski2022. One reason for this may be because
-the MMSE does not draw on executive function in its assessment [@NieuwenhuisMark2010], which is a domain known to be influenced by pain. 
+The larger effect sizes for the MoCA versus MMSE mirror that found by @Pankowski2022. It is possible that there are true differential effects across these screens, driven by differences such as the lack of executive function assessment by the MMSE [@NieuwenhuisMark2010], as this is a core domain influenced by pain. However the differences we observe may instead reflect the wider heterogeneity, eg due included pain conditions.
 
 ## Limitations of evidence
 
@@ -274,19 +359,28 @@ Most studies were uncontrolled for mood and medication differences between pain 
  
 Given that cognitive performance is known to be influenced by age and education, failure to match for these measures clearly introduces a risk of bias (although some studies may still mitigate this by controlling within a subsequent analysis of interest). 
 
-If pain were under-reported by people with cognitive impairment this would introduce systematic error into the findings. There is evidence of such under-reporting for people with a dementia diagnosis [reviewed by @Scherder2005]; however the current review excluded studies on that diagnosis or with similar neuropsychological impairments. Other research shows that less pronounced cognitive deficits are not associated with changes in pain perception or reporting [see e.g. @Kunz2009; @Docking2014].
+If pain were under-reported by people with cognitive impairment this would introduce systematic error into the findings. There is evidence of such under-reporting for people with a dementia diagnosis [reviewed by @Scherder2005]; however the current review excluded studies on that diagnosis or with similar neuropsychological impairments. Other research shows that less pronounced cognitive deficits are not associated with changes in pain perception or reporting [@Kunz2009; @Docking2014].
  
 ## Limitations of review processes
 
+ This review focused on studies comparing pain and pain-free groups, meaning that it did not include longitudinal studies examining change over time or due to interventions, which could give insights into how cognitive screen performance follows the course of pain condition/fluctuation in pain experience. There was also insufficient specification of pain duration across studies to allow controlling for or investigating this factor, which is likely to be of interest given the parallels between chronic pain and neurodegenerative disease [@Apkarian2006]. 
+
 This SR encompasses a range of diagnostic groups and samples without diagnosis (based on self-ratings), which is likely to contribute to the heterogeneity of the findings. We felt it important to represent the range of forms of chronic pain that could arise for clinicians in the assessment of dementia, and have conducted sub-analyses by condition where there was available data.
 
-In addition, this review chose to limit its cognitive screens to a fairly narrow list^[In preparation for this review, the first author collated a list of over 100 measures described across systematic reviews of cognitive screens.], to align with clinical usage. This list was made by UK clinicians and that this may limit generalisability. Moreover, besides the MoCA and MMSE, there were very few studies extracted for the other cognitive screens, meaning that this review heavily focuses on just two measures. However, the studies included come from a range of countries including multiple from the Middle East, South America and Asia, avoiding a focus merely on European and North American samples.
 
-This review focused on studies comparing pain and pain-free groups, meaning that it did not include longitudinal studies examining change over time or due to interventions, which could give insights into how cognitive screen performance follows the course of pain condition/fluctuation in pain experience. 
+## Constraints on generality
+
+This review chose to limit its cognitive screens to a fairly narrow list^[In preparation for this review, the first author collated a list of over 100 measures described across systematic reviews of cognitive screens.], to align with clinical usage. This list was made by UK clinicians and that this may limit generalizability. Moreover, besides the MoCA and MMSE, there were very few studies extracted for the other cognitive screens, meaning that this review heavily focuses on just two measures. However, the studies included come from a range of countries including multiple from the Middle East, South America and Asia, avoiding a focus merely on European and North American samples.
+
 
 
 ## Meaning and implications
-Given the association of effects of between half and one standard deviation poorer performance in chronic-pain experiencing participants, clinicians may wish to consider this when administering cognitive screens. Normative data suggests that in groups with no cognitive impairment, MMSE SD is around three points [@Tombaugh1996] meaning that a typical decrement of `r round(predict(che.mmse)$pred*3,1)` [95% CI `r round(predict(che.mmse)$ci.lb*3,1)` - `r round(predict(che.mmse)$ci.ub*3,1)`] points is a plausible estimate. The larger effects for the MoCA tool would [based on norms in @Rossetti2011 suggesting SD of 4] equate to `r round(predict(simple.moca)$pred*4,1)`  [95% CI `r round(predict(simple.moca)$ci.lb*4,1)` - `r round(predict(simple.moca)$ci.ub*4,1)`] points. Crucial to consider however is whether for at least some conditions involving pain, cognitive impairment may be a marker for later severe decline. Future research should explore screen performance by sub-domains, to identify if there are certain areas where pain impacts and others where it does not affect results.
+Given the association of effects of between half and one standard deviation poorer performance in chronic-pain experiencing participants, clinicians may wish to consider this when administering cognitive screens. Based on point estimate from the low-risk of bias analysis (`r round(predict(che.hi)$pred,1)`), with normative data suggesting the major measures have standard deviations of around three or four [MMSE 3 - @Tombaugh1996 ; MoCA 4 - @Rossetti2011] into raw scores using normative data, we might plausibly see decrements of `r round(predict(che.hi)$pred*3,1)` - `r round(predict(che.hi)$pred*4,1)` points. Crucial to consider however is whether for at least some conditions involving pain, cognitive impairment may be a marker for later severe decline [@Tian2023]. Future research should explore screen performance by sub-domains, to identify if there are certain areas where pain impacts and others where it does not affect results.
+
+```{r tempry}
+# Normative data suggests that in groups with no cognitive impairment, MMSE SD is around three points [@Tombaugh1996] meaning that a typical decrement of `r round(predict(che.hi)$pred*3,1)` [95% CI `r round(predict(che.hi)$ci.lb*3,1)` - `r round(predict(che.hi)$ci.ub*3,1)`] points is a plausible estimate. The larger effects for the MoCA tool would [based on norms in @Rossetti2011 suggesting SD of 4] equate to `r round(predict(simple.moca)$pred*4,1)`  [95% CI `r round(predict(simple.moca)$ci.lb*4,1)` - `r round(predict(simple.moca)$ci.ub*4,1)`] points.
+```
+ 
 
 # Declaration of interest
 
@@ -294,28 +388,17 @@ None.
 
 # References
 
-# Tables
+<div id="refs"></div>
 
-<!---BLOCK_LANDSCAPE_START---> 
+
+
 
 ``` {r, overviewtab, echo = F}
 ### Study characteristics table - keep here
 
 
-library("flextable")
-library("ftExtra")
-library("dplyr")
-library("officer")
-library("openxlsx")
-library("ggpubr")
 
-set_flextable_defaults(
-  font.size = 10, theme_fun = theme_vanilla,
-  padding = 6,
-  background.color = "#EFEFEF")
-
-
-overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/data/study_overview_sheet.xlsx")
+overview <- read.xlsx(here("data", "study_overview_sheet.xlsx"))
 overview <- overview %>%
   mutate(biblio_comp = paste0("@",biblio))
 
@@ -326,10 +409,10 @@ pres_dat <- dfm_e %>%
 
 test <- left_join(pres_dat,pres_overview, by="study_id")
 
-
-
 test <- test %>%
   mutate(age_mean_treat = round(age_mean_treat, 2),
+         n_treat = round(n_treat,0),
+         n_cont = round(n_cont,0),
          age_sd_treat = round(age_sd_treat, 2),
          age_sum_treat = paste0(age_mean_treat," (",age_sd_treat,")"),
          # age_sum_treat = if_else(is.na(age_sum_treat),"NR", age_sum_treat),
@@ -346,43 +429,19 @@ test <- test %>%
   )
 
 
-
-
-
 tab1 <- test %>%
   select(!c(age_mean_treat,age_sd_treat,cognitive_variant, matching_age, study_id, n_cont)) %>%
   arrange(biblio_comp) %>%
-  relocate(biblio_comp, country, sample_treat, n_treat, matching_education, age_sum_treat, cognitive_name) %>%
-  ftExtra::as_flextable() %>%
-  colformat_md() %>%
-  autofit()
-tab1 <- set_table_properties(tab1, layout = "autofit")
-tab1 <- set_header_labels(tab1, 
-                  biblio_comp = "Authors", 
-                  country = "Country",
-                  sample_treat = "Pain group",
-                  n_treat = "Patient group size",
-                  n_cont = "Control group size",
-                  age_sum_treat = "Patient age - Mean (SD)",
-                  matching_education = "Education",
-                  cognitive_name = "Screen"
-                  
-                  ) %>%
-	add_footer_lines("MSK = Musculo-skeletal condition. SLE = Systemic Lupus Erythematosus. Test abbreviations: ACE = Addenbrooke's Cognitive Examination (R = Revised, III = 3rd edition). HVLT = Hopkins Verbal Learning Test. MMSE = Mini-Mental State Examination. MoCA = Montreal Cognitive Assessment. TYM = Test Your Memory test. \U2020 denotes patients significantly older, \U002A\ controls significantly older. NB Li et all reported significant age differences but age data did not allow extraction of a mean and standard deviation.") %>%
-  set_caption("Table 1. Characteristics of studies") 
+  relocate(biblio_comp, country, sample_treat, n_treat, matching_education, age_sum_treat, cognitive_name) 
+ 
 
-tab1 
-
-# put this outside the block to work <!---BLOCK_LANDSCAPE_START---> <!---BLOCK_LANDSCAPE_STOP--->
-# as per https://ardata-fr.github.io/officeverse/officedown-for-word.html#insert-sections
-
-
-
-
+apa_table(tab1
+          , landscape = TRUE
+          , longtable = TRUE
+          , col.names = c("Authors","Country","Pain group","Patient group *n*","Education","Patient age - Mean (SD)","Screen")
+          ,  caption = "Characteristics of studies."
+          , note = "MSK = Musculo-skeletal condition. SLE = Systemic Lupus Erythematosus. Test abbreviations: ACE = Addenbrooke's Cognitive Examination (R = Revised, III = 3rd edition). HVLT = Hopkins Verbal Learning Test. MMSE = Mini-Mental State Examination. MoCA = Montreal Cognitive Assessment. TYM = Test Your Memory test. \U2020 denotes patients significantly older, \U002A\ controls significantly older. NB Li et all reported significant age differences but age data did not allow extraction of a mean and standard deviation.")
 ```
-
-
-
 ```{r, regressiontab}
 
 ma_n <-tibble(totals = c(sum(dfm_mod$n_treat) + sum(dfm_mod$n_cont),
@@ -409,59 +468,64 @@ total_table_n <- cbind(total_table, ma_n)
 
 tab2 <- total_table_n %>%
     select(-order,-justes) %>%
-  relocate(type, method, n, totals) %>%
-    as_flextable() %>%
-  colformat_md() 
-tab2 <- set_table_properties(tab2, layout = "autofit")
-tab2 <- set_header_labels(tab2, 
-                  type = "Dataset", 
-                  method = "Meta-analytic method",
-                  conf = "SMD [95% confidence interval]",
-                  pval = "p-value",
-                  n = "*k*",
-                  totals = "*n*",
-                  i2 = "*I^2^*",
-                  i2_2 = "Within- cluster *I^2^*",
-                  i2_3 = "Between- cluster *I^2^*") %>%
-	add_footer_lines("k = number of studies, n = number of data points, SMD = standardised mean difference, I^2^ = heterogeneity statistic, decomposed into two levels (within each study and between each study) for the multi-level approach, RE = Random Effects, CHE = Correlated & Hierarchical Effects, MMSE = Mini-mental State Examination, MSK = musculoskeletal condition, MoCA = Montreal Cognitive Assessment") %>%
-    set_caption("Chronic pain status associations with cognitive screen performance." )
+  relocate(type, method, n, totals)
 
- tab2 <- width( tab2, width = 1.75, unit = "cm")
- tab2 <- width( tab2,j = 1, width = 2.5, unit = "cm")
-tab2 <- width( tab2,j = 3, width = 1, unit = "cm")
-tab2 <- width( tab2,j = 5, width = 4, unit = "cm")
-tab2 <- width( tab2,j = c(6,7,9), width = 1.5, unit = "cm")
- 
- 
- 
-tab2 %>%  ftExtra::colformat_md(part="all") %>% colformat_num(
-  j = 4,
-  big.mark = ",")
 
- 
+apa_table(tab2
+          , landscape = TRUE
+          , longtable = TRUE
+          , col.names = c("Dataset","Meta-analytic method","*k*","*n*","SMD [95% confidence interval]", "p-value","*I^2^*","Within- cluster *I^2^*","Between- cluster *I^2^*")
+          ,  caption = "Chronic pain status associations with cognitive screen performance."
+          , note = "k = number of studies, n = number of data points, SMD = standardised mean difference, I^2^ = heterogeneity statistic, decomposed into two levels (within each study and between each study) for the multi-level approach, RE = Random Effects, CHE = Correlated & Hierarchical Effects, MMSE = Mini-mental State Examination, MSK = musculoskeletal condition, MoCA = Montreal Cognitive Assessment")
+
+
+
 
 
 ```
 
-<!---BLOCK_LANDSCAPE_STOP---> 
+(ref:prism-label) PRISMA flow diagram.
 
-![Fig 1. PRISMA flow diagram](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/flowchart.jpg)
+(ref:risk-label) Risk of bias plot. Asterisks denote those determined to have low risk of bias. Column numbers are JBI items. Criterion 4 not utilised due to redundancy with other items in this context.
 
-![Fig 2. Risk of bias plot. Asterisks denote those determined to have low risk of bias. Column numbers are JBI items.](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/quality_simp.png)
+(ref:forest-label) Forest plot. Depicts individual effects and pooled effects based on multi-level CHE model.
 
+(ref:fun-label) Funnel Plot (focused studies).
 
-![Fig 3. Forest plot. Depicts individual effects and pooled effects based on multi-level CHE model ](C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/Forest_rich.png)
+```{r, prisming, fig.cap = "(ref:risk-label)", echo = F}
+knitr::include_graphics("../graphs/flowchart.jpg")
+```
 
+```{r, risking, fig.cap = "(ref:risk-label)", echo = F}
+knitr::include_graphics("../graphs/quality_simp.png")
+```
 
-``` {r, funnelling, echo = F}
+```{r, foresting, fig.cap = "(ref:forest-label)", echo = F}
+knitr::include_graphics("../graphs/Forest_rich.png")
+```
+
+``` {r, funnelling, fig.cap = "(ref:fun-label)", echo = F}
+
+res_tri <- trimfill(res_key)
+funnel(res_tri, legend= FALSE, main = "")  #level=c(90, 95), shade=c("white", "gray55"), 
+
+#Figure 3. Forest plot. Depicts individual effects and pooled effects based on multi-level CHE model 
+
+```
+
+``` {r, funnelmetaviz, echo = F, include = F}
+library(metaviz)
  dfm_key<- dfm_mod %>%
     filter(cognitive_focus == "key")
-
-res_key <- rma(yi, vi, data=dfm_key)
-res_tri <- trimfill(res_key)
-funnel(res_tri, legend= TRUE, main = "Funnel Plot (focused studies)")
-
-#This systematic review and meta-analysis offers point effect size estimates as high as `r max(total_table$justes)` and as low as `r min(total_table$justes)` with the  
-
+ res_key <- rma(yi, vi, data=dfm_key)
+ funnelinf(res_key, n = 1, 
+          egger = TRUE, 
+          sig_contours = FALSE,
+          trim_and_fill = TRUE 
+          )
+ 
+ 
 ```
-Fig. 4. Funnel plot.
+
+
+
