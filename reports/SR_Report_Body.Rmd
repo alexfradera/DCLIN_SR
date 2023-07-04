@@ -1,61 +1,22 @@
 ---
-title             : "Does the presence of chronic pain affect scores on cognitive screening tests/brief cognitive measures? A Systematic Review"
+title             : "PLACEHOLDER"
 shorttitle        : "Title"
 
+
 author: 
-  - name          : "Alex Fradera"
+  - name          : "undisclosed"
     affiliation   : "1"
     corresponding : yes    # Define only one corresponding author
-    address       : "School of Health & Wellbeing, College of Medical, Veterinary and Life Sciences, University of Glasgow, Clarice Pears Building, 90 Byres Road, Glasgow, G12 8TB"
-    email         : "alexander.fradera@glasgow.ac.uk"
+    address       : "undisclosed"
+    email         : "undisclosed@undisclosed.com"
     role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
-      - "Conceptualization"
-      - "Data curation"
-      - "Formal analysis"
-      - "Investigation"
-      - "Methodology"
-      - "Project administration"
-      - "Software"
-      - "Visualisation"
-      - "Writing - Original Draft Preparation"
-      - "Writing - Review & Editing"
-  - name          : "Jessica McLaren"
-    affiliation   : "2"
-    role:
-      - "Investigation"
-      - "Methodology"
-      - "Writing - Review & Editing"
-      
-  - name          : "Lisa Gadon"
-    affiliation   : "3"
-    role:
-      - "Conceptualization"
-      - "Methodology"
-      - "Writing - Review & Editing"
-      
-  - name          : "Breda Cullen"
-    affiliation   : "1"
-    role:
-      - "Conceptualization"
-      - "Methodology"
-      - "Writing - Review & Editing"
-
-      
-  - name          : "Jonathan Evans"
-    affiliation   : "1"
-    role:
-      - "Conceptualization"
-      - "Methodology"
       - "Writing - Review & Editing"
 
 affiliation:
   - id            : "1"
-    institution   : "University of Glasgow"
-  - id            : "2"
-    institution   : "NHS Ayrshire and Arran"
-  - id            : "3"
-    institution   : "NHS Greater Glasgow and Clyde"
+    institution   : "undisclosed"
 
+    
 authornote: |
 
 
@@ -183,7 +144,7 @@ The aim of this study was to conduct a systematic review/meta-analysis to assess
 
 # Method
 
-The study followed the PRISMA guidelines for reporting SRs and MAs [@Moher2009].  The protocol of the study was registered with the International Prospective Register of Systematic Reviews (PROSPERO) [registration number: CRD 42021272835] and published elsewhere (https://osf.io/jsqxn/); this includes an analysis plan released prior to the work being conducted. The protocol was updated 14th May 2022 to clarify that comparisons must involve pain-free controls.
+The study followed the PRISMA guidelines for reporting SRs and MAs [@Moher2009].  The protocol of the study was registered with the International Prospective Register of Systematic Reviews (PROSPERO) [registration number: CRD 42021272835] and published elsewhere (anonymized view https://osf.io/jsqxn/?view_only=237cdaa33511422890730eb1de49d44d ) ; this includes an analysis plan released prior to the work being conducted. The protocol was updated 14th May 2022 to clarify that comparisons must involve pain-free controls.
 
 ## Eligibility criteria
 
