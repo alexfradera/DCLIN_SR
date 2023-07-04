@@ -4,6 +4,7 @@ library(meta)
 library(metafor)
 #library(dmetar)
 library(tidyverse)
+library(dplyr)
 library(ggplot2)
 library(openxlsx)
 library(estmeansd)
@@ -20,6 +21,7 @@ library("ftExtra")
 library(stringr)
 library(pryr) # for shortcuts using partial
 library(captioner)
+library(here)
 # library(dmetar)
 #---------------------------------
 # FUNCTIONS
@@ -42,9 +44,9 @@ citest <- partial(sup_table_nums, display = "cite")
 # ==================
 # read and clean dataset
 
-# dfm <- read.xlsx("Data_SR.xlsx")
-dfm <- read.xlsx("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\Data_SR.xlsx")
+# dfm <- read.xlsx("~/2. Research/1. Ongoing research/pre-qualification research projects/DCLIN_SR_git/Data_SR.xlsx")
 
+dfm <-read.xlsx(here('data', 'Data_SR.xlsx'))
 
 # glimpse(dfm)
 
@@ -73,7 +75,7 @@ dfm2<- dfm %>%
 
 
 levels(dfm2$cognitive_name)
-# set levels - this is to match the structure of a correlation  matrix used later
+# set levels - this is to match the structure of the correlation  matrix used later
 dfm2 <- dfm2 %>%
   mutate(cognitive_name = fct_relevel(cognitive_name, "MMSE","MoCA", "TYM", "ACE", "HVLT"))
 
@@ -98,6 +100,7 @@ repeats <- dfm2 %>%
 
 
 #' Calculate I-squared values and variance distribution for multilevel meta-analysis models
+#' This is a function used later in the process - specifically in model_making.R
 #'
 #' This function calculates values of \eqn{I^2} and the variance distribution for multilevel meta-analysis
 #' models fitted with \code{\link[metafor]{rma.mv}}.
