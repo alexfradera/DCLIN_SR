@@ -1,30 +1,13 @@
 # SBEP_staff_script_q3
 
-source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\qa_aid2.R")
+source(here('scripts', 'qa_aid2.R')) 
 
 
-
-
+ 
+ 
 # ===============================
 # Models
 # ===============================
-
-#== model head and tail - for Forest plot depiction
-# NB important this does not separate studies across plots - more for useability than anything.
-# default would split Ojeda et al. Country arrangement preserves study by study but in new order.
-overview <- read.xlsx("C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/data/study_overview_sheet.xlsx")
-overview <- select(overview,-study_num)
-dfm_studies <- left_join(dfm_mod,overview, by="study_id")
-countrified <- dfm_studies %>%
-  arrange(country)
-rows = nrow(countrified)
-hed <- round(rows/2,digits=0)
-tel = rows = hed
-dfm_hed <- head(countrified,hed)
-dfm_tel <- tail(countrified,tel)
-
-
-
 
 # high quality comparisons only
 qual_tog <- quality_scores_vals %>%
@@ -37,19 +20,12 @@ dfm_hi <- dfm_mod %>%
 dfm_lo <- dfm_mod %>%
   filter(toggle==0)
 
-
-# only uniques - no within-study heterogeneity. for exploration only
-  dfm_test <- dfm_mod %>%
-    filter(comp==1)
-
-
 ### SCREENS  ###
 # only mmse 
   dfm_mmse_all <- dfm_mod %>%
     filter(cognitive_name =="MMSE")
 
   table(dfm_mmse_all$toggle) # no of hi-qual available
-  
   
   dfm_mmse <- filter(dfm_mmse_all, toggle==1)  
   
@@ -60,11 +36,6 @@ dfm_lo <- dfm_mod %>%
   table(dfm_moca_all$toggle) # no of hi-qual available
   
   dfm_moca <- filter(dfm_moca_all, toggle==1)    
-  
-# compliment to only mmse - for depiction purposes?
-#  dfm_not_mmse <- dfm_mod %>%
-#    filter(cognitive_name !="MMSE")
-   #  mutate(author_final2 = str_trunc(author_final,19, "right"))
 
 ### Patient groups ###
   table(dfm_mod$sample_treat_cat)
@@ -74,23 +45,28 @@ dfm_lo <- dfm_mod %>%
   
   dfm_arthritis_full <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Arthritis"))
+  
+  table(dfm_arthritis_full$toggle) # no of hi-qual available
   dfm_arthritis <- dfm_arthritis_full %>%
     filter(toggle==1)
   
-  
   dfm_fm_full <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Fibromyalgia"))
-  #dfm_fm <- dfm_fm_full %>%
+  table(dfm_fm_full$toggle)
+  #dfm_fm <- dfm_fm_full %>%  # NB too few for analysis - step not taken
   #  filter(toggle==1)
-  
   
   dfm_msk_full <-dfm_mod %>%
     filter(sample_treat_cat %in% c("MSK"))
-  #dfm_fm <- dfm_fm_full %>%
+  table(dfm_msk_full$toggle)
+  #dfm_fm <- dfm_fm_full %>% # NB too few for analysis - step not taken
   #  filter(toggle==1)
   
   dfm_head_full <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Headache"))
+  table(dfm_head_full$toggle)
+  #dfm_head <- dfm_head_full %>% # NB too few for analysis - step not taken
+  #  filter(toggle==1)
   
 ## depression-free
   depcut<- filter(aim2,q6_mood_confound == "comparable")
@@ -100,23 +76,6 @@ dfm_lo <- dfm_mod %>%
 # tidy
   rm(aim1,df,df2,dfm, dfm_c,dfm_cd,dfm_cda,dfm_cdap,dfm_cdapa,dfm_e1,dfm_e2,dfm3)
   
-  # ===============================
-# FULL MODEL
-# 1 simple random-effects model (no accounting for non-independence)
- 
-    
-
-
-# with HSK
-#simple_hsk <- rma(yi, vi, data=dfm_mod, method = "HSk")
-
-
-# forest(simple, slab = dfm_mod$author_final)
-
-# ====================================================
-# 2 Preparing data for CHE model
-
-
 # Collect rho in here:
 R <- matrix(1, nrow=5, ncol=5)
 diag(R) <- 1
@@ -138,8 +97,6 @@ quick_v <- function(dataset){
         obs=cognitive_name, rho=R, data=dataset) }
 
 V <- quick_v(dfm_mod)
-Vhed <- quick_v(dfm_hed)
-Vtel <- quick_v(dfm_tel)
 Vhi <- quick_v(dfm_hi)
 Vlo <- quick_v(dfm_lo)
 Vmms <- quick_v(dfm_mmse)
@@ -162,8 +119,11 @@ cov2cor(V[dfm_mod$study_num == 993, dfm_mod$study_num == 993]) # MMSE and MOCA
 cov2cor(V[dfm_mod$study_num == 994, dfm_mod$study_num == 994]) # MMSE 2 groups
 
 
-# 3. start running Correlated and Hierarchical Effects models:
-# 3a Raw CHE model:
+# 3. start running Models, both
+# 3a: simple random-effects model (no accounting for non-independence)
+# 3b Correlated and Hierarchical Effects models (CHE) where clusters exist
+
+# CHE function
 rmvee <- function(dataset,vmat, modifier=""){
   if (is.na(modifier)){
                   rma.mv(yi, V= vmat, 
@@ -185,18 +145,20 @@ rmvee <- function(dataset,vmat, modifier=""){
 }
 
 
+# Main model - all data
+## Simple RE model:
 simple.model <- rma(yi, vi, data=dfm_mod)
 confint(simple.model)
 predict(simple.model)
+## CHE model
 che.model <- rmvee(dfm_mod,vmat=V)
 che.ci <- confint(che.model)
 model.i2 <- var.comp(che.model)
 main_model_output <- predict(che.model)
+## CHE + RVE/Sandwich
 rve.model <- robust(che.model, cluster=study_id, clubSandwich=TRUE) # substantially same as che.model
 
-
-
-
+# some manual sense-checking of the I2 factors
 res <- rma.mv(yi, vi, random = ~ factor(unique_id) | study_num, data=dfm_mod)
 res.ci <- confint(res)
 W <- diag(1/dfm_mod$vi)
@@ -206,34 +168,31 @@ P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
 100 * res.ci[[1]]$random[1,2:3] / (res.ci[[1]]$random[1,2:3] + (res$k-res$p)/sum(diag(P)))
 
 # High quality and low quality
-
+## Simple RE model:
 simple.hi <- rma(yi, vi, data=dfm_hi)
 confint(simple.hi)
+## CHE
 che.hi <- rmvee(dfm_hi,vmat=Vhi)
 hi.i2 <- var.comp(che.hi)
 
 simple.lo <- rma(yi, vi, data=dfm_lo)
 confint(simple.lo)
+
 che.lo <- rmvee(dfm_lo,vmat=Vlo)
 hi.i2 <- var.comp(che.lo)
 
-# che.hed <- rmvee(dfm_hed,vmat=Vhed)
-# che.tel <- rmvee(dfm_tel,vmat=Vtel)
-# che.test <- rmvee(dfm_test,vmat=Vcomp)
-
+# By cognitive screen type
+# MMSE
 simple.mmse <- rma(yi, vi, data=dfm_mmse)
 che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
 mmse.i2  <- var.comp(che.mmse)
 forest(che.mmse, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
               showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
 
+# MoCA  No need for CHE - no clusters
 simple.moca <- rma(yi, vi, data=dfm_moca)
-# che.moca <- rmvee(dfm_moca,vmat=Vmoc) - no information, as no clusters here
-#moca.i2  <- var.comp(che.moca)
-#forest(che.moca, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
-#       showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
 
-
+# Using goups as a variable - ended up just breaking into subgroups
 simple.groups<- rma(yi, vi, data=dfm_maincons, mods= ~ sample_treat_cat -1)
 che.groups <-    rma.mv(yi, V= Vmaincons,
                       data = dfm_maincons,
@@ -244,51 +203,29 @@ che.groups <-    rma.mv(yi, V= Vmaincons,
                        sparse = TRUE)
 groups.i2  <- var.comp(che.groups)
 
+# Arthritis
 simple.arth <- rma(yi,vi, data=dfm_arthritis)
 che.arth <- rmvee(dfm_arthritis,vmat=Varth)
 
-
+# Fibromyalgia
 simple.fm <- rma(yi,vi, data=dfm_fm_full)
 che.fm <- rmvee(dfm_fm_full,vmat=Vfm)
 
+#MSK
 simple.msk <- rma(yi,vi, data=dfm_msk_full)
 che.msk <- rmvee(dfm_msk_full,vmat=Vmsk)
 
-
+# Headache
 simple.head <- rma(yi,vi, data=dfm_head_full)
 che.head <- rmvee(dfm_head_full,vmat=Vhead)
 
-
+# Depression (no clusters)
 simple.dep <- rma(yi, vi, data=dfm_depfree)
 
 
 
-
-
-
-
-
-
-
-
-
-
-# ============================================================
-
-
-
-
-
-# can also add a potential covariate
-che.model2 <- rma.mv(yi ~ cognitive_name -1,
-                     V = V,
-                     random = ~ 1 | study_num/unique_id,
-                     data = dfm_mod,
-                     sparse = TRUE)
-
-
 # ===========================
-
+# Creating table with data
 
 che_names <- c("Total dataset", "Low risk of bias", "High risk of bias", "MMSE","Arthritis","Fibromyalgia", "MSK", "Headache")
 che_modellist <- vector(mode = "list", length = 8)
@@ -311,7 +248,7 @@ presentable <- raw_overall %>%
   transmute(
     order = i,
     type = names[i],
-    method = "Multi-level",
+    method = "CHE",
     n = modelnow$k,
     justes =  pred,
     conf = paste0(pred, " [", ci.lb, " - ",  ci.ub,"]"),
@@ -350,7 +287,7 @@ presentable <- raw_overall %>%
   transmute(
     order = i,
     type = names[i],
-    method = "Random Effects",
+    method = "RE",
     justes =  pred,
     n = modelnow$k,
     conf = paste0(pred, " [", ci.lb, " - ",  ci.ub,"]"),
@@ -364,7 +301,8 @@ bind_rows(simp_tablelist)
 
 total_table <- bind_rows(che_tablelist,simp_tablelist)
 total_table <- total_table %>% arrange(order,method)
-total_table <- as.tibble(total_table)
+total_table <- as_tibble(total_table)
 
 
 metacont(data=dfm_depfree,n_cont, cognitive_mean_cont, cognitive_sd_cont,n_treat, cognitive_mean_treat,cognitive_sd_treat, sm = "SMD")
+

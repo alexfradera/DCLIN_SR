@@ -1,5 +1,5 @@
+source(here('scripts', 'merge_groups.R')) 
 
-source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\merge_groups.R")
 
 # ==================
 # turn median scores into useable scores
@@ -7,8 +7,6 @@ source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\D
 
 # two quick functions - the key is to just extract the one returned value (eg $est.mean)
 # (otherwise it doesn't play well with vectors/dfms)
-
-
 
 
 unmed<- function(v1,m,v2,n, group) {
@@ -22,8 +20,8 @@ unmed<- function(v1,m,v2,n, group) {
   }
 }
 
-#owl <-  select(dfm_c,dep_iqr1_treat, dep_median_treat,dep_iqr2_treat,n_treat)
 
+# use these functions on all cognitive medians
 dfm_c <- dfm3 %>%
   rowwise() %>% 
   mutate(k = list(unmed(cognitive_iqr1_treat, cognitive_median_treat,cognitive_iqr2_treat,n_treat,"t"))) %>%
@@ -39,8 +37,7 @@ dfm_c <- dfm3 %>%
   )  %>%
   select(!est_mean_treat:est_sd_cont) 
 
-
-
+# .... all depression medians
 dfm_cd <- dfm_c %>%
   rowwise() %>% 
   mutate(k = list(unmed(dep_iqr1_treat, dep_median_treat,dep_iqr2_treat,n_treat,"t"))) %>%
@@ -56,6 +53,7 @@ dfm_cd <- dfm_c %>%
   )%>%
   select(!est_mean_treat:est_sd_cont)
 
+# ... all anxiety medians
 dfm_cda <- dfm_cd %>%
   rowwise() %>% 
   mutate(k = list(unmed(anx_iqr1_treat, anx_median_treat,anx_iqr2_treat,n_treat,"t"))) %>%
@@ -71,9 +69,7 @@ dfm_cda <- dfm_cd %>%
   ) %>%
   select(!est_mean_treat:est_sd_cont)
 
-# owl <-  select(dfm_cda,unique_id, anx_iqr1_cont, anx_median_cont,anx_iqr2_cont,n_cont,anx_mean_treat)
-
-
+# ... all pain medians
 dfm_cdap <- dfm_cda %>% # NB no medians for controls here
   rowwise() %>% 
   mutate(k = list(unmed(pain_iqr1_treat, pain_median_treat,pain_iqr2_treat,n_treat,"t"))) %>%
@@ -85,6 +81,7 @@ dfm_cdap <- dfm_cda %>% # NB no medians for controls here
   ) %>%
   select(!est_mean_treat:est_sd_treat)
 
+#.... all age medians
 dfm_cdapa <- dfm_cdap %>%
   rowwise() %>% 
   mutate(k = list(unmed(age_iqr1_treat, age_median_treat,age_iqr2_treat,n_treat,"t"))) %>%
@@ -102,7 +99,6 @@ dfm_cdapa <- dfm_cdap %>%
 
 
 # CHECKS
-
 dfm3 %>%  count(is.na(cognitive_mean_treat)) 
 dfm_cdapa %>%  count(is.na(cognitive_mean_treat))
 
@@ -118,4 +114,5 @@ dfm_cdapa %>%  count(is.na(anx_mean_treat))
 dfm3 %>%  count(is.na(age_mean_treat))
 dfm_cdapa %>%  count(is.na(age_mean_treat))  
 
+# return the dataframe for the next step.
 dfm_e <-dfm_cdapa

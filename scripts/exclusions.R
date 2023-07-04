@@ -1,3 +1,6 @@
+# helper script to understand what led to exclusions at full-text.
+# not part of wider data flow.
+
 # exclusions
 exclu <- tibble::tribble(
                       ~reason,

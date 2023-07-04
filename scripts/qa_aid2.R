@@ -1,9 +1,12 @@
-source("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\scripts\\vi_yi.R")
 
-# qa_aid2
-df <- read.xlsx("C:\\Users\\Alexander Fradera\\OneDrive - University of Glasgow\\DClin\\Deliverables\\Systematic Review\\Writeup\\DCLIN_SR_git\\quality_review.xlsx")
+source(here('scripts', 'vi_yi.R')) 
 
+ df <- read.xlsx(here("data", "quality_review.xlsx"))
 
+# df <- read.xlsx("C:\\Users\\ajf11r\\OneDrive - University of Glasgow\\Documents\\2. Research\\1. Ongoing research\\pre-qualification research projects\\DCLIN_SR_git\\quality_review.xlsx")
+
+# simplify dataset and collapse the two Terassi rows into one, so it doesn't fail when merged with 
+# analysis dataset (where this was done)
 df2<- df %>% 
   mutate(across(!c(
     unique_id,
@@ -17,7 +20,8 @@ df2<- df %>%
     q5_other_confound), factor),
     unique_id = if_else(unique_id == "TER167-A", "TER167-COMB", unique_id ))
 
-
+# Operationalise decisions on Items 5 and 6 based upon reporting/controlling
+# for key variables
 aim1 <-   df2 %>%
   mutate(
     ed_age_report           = ifelse(q5_6_ed_confound == "not reported"|q5_6_ed_confound == "unclear"| q5_6_age_confound == "unclear", "no", "yes"),
@@ -40,7 +44,7 @@ justauthors <- dfm_mod %>%
 aim2 <- left_join(aim1,justauthors, by=c("unique_id", "study_id"))
 aim2 <-  mutate_all(aim2,factor)
 
-
+# clean up dataset for easy use
 quality_scores_f <- aim2 %>%
   transmute(
     study_id =study_id,
@@ -60,6 +64,7 @@ quality_scores_f <- aim2 %>%
 
 # =======
 
+# recode characters into 3/2/1 to work with quality plot (in qualinprogress.R)
 quality_scores_vals <- quality_scores_f %>% 
   mutate_at(.vars = vars(J1:J8), 
             .funs = function(x) recode(x, 
@@ -67,6 +72,8 @@ quality_scores_vals <- quality_scores_f %>%
                                        `unclear` = 2,
                                        `no` = 1)) 
 
+# Introduce high/low quality variable, where toggle==0 means failing 
+# one of the 3 key quality measures
 quality_scores_vals <-  quality_scores_vals %>%
   mutate(
         quality_quant = rowSums(across(where(is.numeric)),na.rm = T),
@@ -74,8 +81,9 @@ quality_scores_vals <-  quality_scores_vals %>%
         )
 
 options("openxlsx.borderColour" = "#4F80BD") #
-write.xlsx(quality_scores_vals, "quality_scores_vals.xlsx", asTable = FALSE, overwrite = TRUE)
 
+write.xlsx(quality_scores_vals, here('data',"quality_scores_vals.xlsx"), asTable = FALSE, overwrite = TRUE)
+#write.xlsx(quality_scores_vals, "quality_scores_vals.xlsx", asTable = FALSE, overwrite = TRUE)
 
-qualityset<- quality_scores_vals # NB PLACEHOLDER
+# qualityset<- quality_scores_vals 
 
