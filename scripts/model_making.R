@@ -186,8 +186,6 @@ hi.i2 <- var.comp(che.lo)
 simple.mmse <- rma(yi, vi, data=dfm_mmse)
 che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
 mmse.i2  <- var.comp(che.mmse)
-forest(che.mmse, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
-              showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
 
 # MoCA  No need for CHE - no clusters
 simple.moca <- rma(yi, vi, data=dfm_moca)

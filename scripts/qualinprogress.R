@@ -6,14 +6,12 @@
 # Use Affinity Designer to export each pdf as a png
 # Link to the png within the .rmd.
 
+# ===================================================================
+#                                     FOREST PLOT
+
 # ==========================
-# FOREST PLOT
-# MAKE GOOD PDF
+# Simple Plot - currently not used in report
 
-forest(che.hi, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
-       showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
-
-# Simple - not ultimately used
 plot.new()
 forest(che.model, slab=author_final, annotate=TRUE, addfit=TRUE, addpred=FALSE, at= seq(-1,5, by =1), xlim=c(-5,8),
        showweights=FALSE, header=TRUE, order = study_id, cex=.8, top = 0)
@@ -21,8 +19,9 @@ dev.print(pdf, file=here("graphs", "Forest_simpleX.pdf") ,
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
 
-
-# Richer version with a bit more info. Either use plot.new and dev.print or the tiff and dev off.
+# ==========================
+# Richer version with a bit more info. Using plot.new() and dev.print to call .pdf
+# For .tif, uncomment the call to tiff() and dev.off() and recomment the dev.print line
 
 # tiff(file=here("graphs", "foresttiff.tif"), 
 #     units="in", width = 21/2.54, height = 29.7/2.54, res=1200)
@@ -45,9 +44,10 @@ dev.print(pdf, file=here("graphs", "Forest_rich.pdf"),
         onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
 
-# ==========================
-# Risk of bias/quality traffic light graphic
+# ===================================================================
+#                                     RISK OF BIAS PLOT (TRAFFIC LIGHT)
 
+# =========================
 # prepare dataset
 qualityset <- filter(quality_scores_vals, comp ==1)
 qualityset <- arrange(qualityset,study_id)
@@ -56,11 +56,12 @@ qualityset <- qualityset %>%
   mutate(Study = ifelse(toggle==1, paste0(Study,"*"),paste0(Study))) %>%
   arrange(Study) # mark the high-quality studies with *
 
-#
-
+# determine symbols to use
 syms <- c( "-", "?","+")
 
+# =========================
 # Simple version - colour
+
 cols <- c("red", "yellow","green")
 plot.new()
 plot.window(xlim=c(0,10), ylim = c(-1,slots*15 +30))
@@ -91,7 +92,9 @@ abline(h = 610)
 dev.print(pdf, file=here("graphs", "quality_simp_col.pdf"),
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
+# =========================
 # Simple version - bw
+
 cols <- c("dark grey", "light grey","white")
 plot.new()
 plot.window(xlim=c(0,10), ylim = c(-1,slots*15 +30))
@@ -122,16 +125,17 @@ abline(h = 610)
 dev.print(pdf, file=here("graphs", "quality_simp_bw.pdf"),
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
-# Simple version - bw - tweaking in progress
 
 
-# ADDED: Simple version with tiff function for either black and white or colour
-tiff(file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/newtiff.tif", 
-     units="in", width = 21/2.54, height = 29.7/2.54, res=1200)
-
+# =========================
+# Simple version - .tif - either b/w or colour.
+# Switch out the assignment of cols below to end up with colour or b/w
 
 #cols <- c("dark grey", "light grey","white")
 cols <- c("red", "yellow","green")
+
+tiff(file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/newtiff.tif", 
+     units="in", width = 21/2.54, height = 29.7/2.54, res=1200)
 
 plot.new()
 plot.window(xlim=c(0,10), ylim = c(-1,slots*15 +30))
@@ -163,9 +167,8 @@ dev.off()
 # dev.print(pdf, file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/quality_simp_bw_tweak.pdf" ,           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
 
-
-
-# Version with more information - not ultimately used
+# ================================
+# More complex plot - not ultimately used
 
 plot.new()
 plot.window(xlim=c(0,10), ylim = c(-1,slots*15 +25))
@@ -193,7 +196,7 @@ dev.print(pdf, file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow
           onefile=T,paper='A4', width = 21/2.54, height = 29.7/2.54) 
 
 #=====
-# FUnnel plot tiff
+# Funnel plot tiff
 #tiff(file="C:/Users/Alexander Fradera/OneDrive - University of Glasgow/DClin/Deliverables/Systematic Review/Writeup/DCLIN_SR_git/graphs/funneltiff.tif", 
 #     units="in", width = 5, height = 5, res=1200)
 #pdf(file='forestplot.pdf')
