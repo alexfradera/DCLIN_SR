@@ -227,15 +227,15 @@ hi.i2 <- var.comp(che.lo)
 
 # By cognitive screen type
 # MMSE - hiqual only
-simple.mmse <- rma(yi, vi, data=dfm_mmse_high)
-che.mmse  <- rmvee(dfm_mmse_high,vmat=Vmms)
-mmse.i2  <- var.comp(che.mmse)
+simple.mmse_high <- rma(yi, vi, data=dfm_mmse_high)
+che.mmse_high  <- rmvee(dfm_mmse_high,vmat=Vmms)
+mmse_high.i2  <- var.comp(che.mmse_high)
 
 
 #MMSE - all studies
-simple.mmse_full <- rma(yi, vi, data=dfm_mmse)
-che.mmse_full  <- rmvee(dfm_mmse,vmat=Vmms_f)
-mmse_full.i2  <- var.comp(che.mmse_full)
+simple.mmse <- rma(yi, vi, data=dfm_mmse)
+che.mmse  <- rmvee(dfm_mmse,vmat=Vmms_f)
+mmse.i2  <- var.comp(che.mmse)
 
 # MoCA  No need for CHE - no clusters
 simple.moca <- rma(yi, vi, data=dfm_moca)
@@ -253,12 +253,12 @@ che.groups <-    rma.mv(yi, V= Vmaincons,
 groups.i2  <- var.comp(che.groups)
 
 # Arthritis - hiqual only
-simple.arth <- rma(yi,vi, data=dfm_arthritis_high)
-che.arth <- rmvee(dfm_arthritis_high,vmat=Varth)
+simple.arth_high <- rma(yi,vi, data=dfm_arthritis_high)
+che.arth_high <- rmvee(dfm_arthritis_high,vmat=Varth)
 
 # Arthritis - all studies
-simple.arth_full <- rma(yi,vi, data=dfm_arthritis)
-che.arth_full <- rmvee(dfm_arthritis,vmat=Varth_f)
+simple.arth <- rma(yi,vi, data=dfm_arthritis)
+che.arth <- rmvee(dfm_arthritis,vmat=Varth_f)
 
 # Fibromyalgia
 simple.fm <- rma(yi,vi, data=dfm_fm)
@@ -273,8 +273,8 @@ simple.head <- rma(yi,vi, data=dfm_head)
 che.head <- rmvee(dfm_head,vmat=Vhead)
 
 # Depression (no clusters)
-simple.dep <- rma(yi, vi, data=dfm_depfree_high)
-simple.dep_full <- rma(yi, vi, data=dfm_depfree)
+simple.dep_high <- rma(yi, vi, data=dfm_depfree_high)
+simple.dep <- rma(yi, vi, data=dfm_depfree)
 
 
 # age
@@ -303,13 +303,13 @@ che_modellist <- vector(mode = "list", length = 10)
   che_modellist[[1]] <- che.model
   che_modellist[[2]] <- che.hi
   che_modellist[[3]] <- che.lo
-  che_modellist[[4]] <- che.mmse_full
-  che_modellist[[5]] <- che.arth_full
+  che_modellist[[4]] <- che.mmse
+  che_modellist[[5]] <- che.arth
   che_modellist[[6]] <- che.fm
   che_modellist[[7]] <- che.msk
   che_modellist[[8]] <- che.head
-  che_modellist[[9]] <- che.mmse
-  che_modellist[[10]] <- che.arth
+  che_modellist[[9]] <- che.mmse_high
+  che_modellist[[10]] <- che.arth_high
   
   
 che_tablelist <- vector(mode = "list", length = 10)
@@ -343,16 +343,16 @@ simp_tablelist <- vector(mode = "list", length = 16)
 simp_modellist[[1]] <- simple.model
 simp_modellist[[2]] <- simple.hi
 simp_modellist[[3]]<- simple.lo
-simp_modellist[[4]] <- simple.mmse_full
+simp_modellist[[4]] <- simple.mmse
 simp_modellist[[5]] <-  simple.moca
-simp_modellist[[6]] <-  simple.arth_full
+simp_modellist[[6]] <-  simple.arth
 simp_modellist[[7]] <-  simple.fm
 simp_modellist[[8]] <-  simple.msk
 simp_modellist[[9]] <-  simple.head
-simp_modellist[[10]] <-  simple.dep_full
-simp_modellist[[11]] <-  simple.mmse
-simp_modellist[[12]] <-  simple.arth
-simp_modellist[[13]] <-  simple.dep
+simp_modellist[[10]] <-  simple.dep
+simp_modellist[[11]] <-  simple.mmse_high
+simp_modellist[[12]] <-  simple.arth_high
+simp_modellist[[13]] <-  simple.dep_high
 simp_modellist[[14]] <- simple.young
 simp_modellist[[15]] <- simple.old
 simp_modellist[[16]] <- simple.well.old
