@@ -31,20 +31,20 @@ dfm_lo <- dfm_mod %>%
 
 ### SCREENS  ###
 # only mmse 
-  dfm_mmse_full <- dfm_mod %>%
+  dfm_mmse <- dfm_mod %>%
     filter(cognitive_name =="MMSE")
 
-  table(dfm_mmse_full$toggle) # no of hi-qual available
+  table(dfm_mmse$toggle) # no of hi-qual available
   
-  dfm_mmse <- filter(dfm_mmse_full, toggle==1)  
+  dfm_mmse_high <- filter(dfm_mmse, toggle==1)  
   
 # only moca
-  dfm_moca_full <- dfm_mod %>%
+  dfm_moca <- dfm_mod %>%
     filter(cognitive_name =="MoCA") 
   
-  table(dfm_moca_full$toggle) # no of hi-qual available
+  table(dfm_moca$toggle) # no of hi-qual available
   
-  dfm_moca <- filter(dfm_moca_full, toggle==1)    
+  dfm_moca_high <- filter(dfm_moca, toggle==1)    
 
 ### Patient groups ###
   table(dfm_mod$sample_treat_cat)
@@ -52,35 +52,35 @@ dfm_lo <- dfm_mod %>%
   dfm_maincons <- dfm_mod %>%
     filter(sample_treat_cat %in% c("Arthritis","Fibromyalgia","Headache","MSK"))
   
-  dfm_arthritis_full <-dfm_mod %>%
+  dfm_arthritis <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Arthritis"))
   
-  table(dfm_arthritis_full$toggle) # no of hi-qual available
-  dfm_arthritis <- dfm_arthritis_full %>%
+  table(dfm_arthritis$toggle) # no of hi-qual available
+  dfm_arthritis_high <- dfm_arthritis %>%
     filter(toggle==1)
   
-  dfm_fm_full <-dfm_mod %>%
+  dfm_fm <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Fibromyalgia"))
-  table(dfm_fm_full$toggle)
-  #dfm_fm <- dfm_fm_full %>%  # NB too few for analysis - step not taken
+  table(dfm_fm$toggle)
+  #dfm_fm <- dfm_fm %>%  # NB too few for analysis - step not taken
   #  filter(toggle==1)
   
-  dfm_msk_full <-dfm_mod %>%
+  dfm_msk <-dfm_mod %>%
     filter(sample_treat_cat %in% c("MSK"))
-  table(dfm_msk_full$toggle)
-  #dfm_fm <- dfm_fm_full %>% # NB too few for analysis - step not taken
+  table(dfm_msk$toggle)
+  #dfm_fm <- dfm_fm %>% # NB too few for analysis - step not taken
   #  filter(toggle==1)
   
-  dfm_head_full <-dfm_mod %>%
+  dfm_head <-dfm_mod %>%
     filter(sample_treat_cat %in% c("Headache"))
-  table(dfm_head_full$toggle)
-  #dfm_head <- dfm_head_full %>% # NB too few for analysis - step not taken
+  table(dfm_head$toggle)
+  #dfm_head <- dfm_head %>% # NB too few for analysis - step not taken
   #  filter(toggle==1)
   
 ## depression-free
   depcut<- filter(aim2,q6_mood_confound == "comparable")
-  dfm_depfree_full <- semi_join(dfm_mod,depcut, by="unique_id")
-  dfm_depfree<- filter(dfm_depfree_full, toggle==1)     
+  dfm_depfree <- semi_join(dfm_mod,depcut, by="unique_id")
+  dfm_depfree_high<- filter(dfm_depfree, toggle==1)     
 
   
   
@@ -141,14 +141,14 @@ quick_v <- function(dataset){
 V <- quick_v(dfm_mod)
 Vhi <- quick_v(dfm_hi)
 Vlo <- quick_v(dfm_lo)
-Vmms <- quick_v(dfm_mmse)
-Vmms_f <- quick_v(dfm_mmse_full)
-Varth <- quick_v(dfm_arthritis)
-Varth_f <- quick_v(dfm_arthritis_full)
-Vfm  <- quick_v(dfm_fm_full)
-Vmsk <- quick_v(dfm_msk_full)
-Vhead <- quick_v(dfm_head_full)
-# Vmoc <- quick_v(dfm_moca) unneeded, no clusters
+Vmms <- quick_v(dfm_mmse_high)
+Vmms_f <- quick_v(dfm_mmse)
+Varth <- quick_v(dfm_arthritis_high)
+Varth_f <- quick_v(dfm_arthritis)
+Vfm  <- quick_v(dfm_fm)
+Vmsk <- quick_v(dfm_msk)
+Vhead <- quick_v(dfm_head)
+# Vmoc <- quick_v(dfm_moca_high) unneeded, no clusters
 Vmaincons <- quick_v(dfm_maincons)
 # Vcomp <- quick_v(dfm_test)
 
@@ -227,18 +227,18 @@ hi.i2 <- var.comp(che.lo)
 
 # By cognitive screen type
 # MMSE - hiqual only
-simple.mmse <- rma(yi, vi, data=dfm_mmse)
-che.mmse  <- rmvee(dfm_mmse,vmat=Vmms)
+simple.mmse <- rma(yi, vi, data=dfm_mmse_high)
+che.mmse  <- rmvee(dfm_mmse_high,vmat=Vmms)
 mmse.i2  <- var.comp(che.mmse)
 
 
 #MMSE - all studies
-simple.mmse_full <- rma(yi, vi, data=dfm_mmse_full)
-che.mmse_full  <- rmvee(dfm_mmse_full,vmat=Vmms_f)
+simple.mmse_full <- rma(yi, vi, data=dfm_mmse)
+che.mmse_full  <- rmvee(dfm_mmse,vmat=Vmms_f)
 mmse_full.i2  <- var.comp(che.mmse_full)
 
 # MoCA  No need for CHE - no clusters
-simple.moca <- rma(yi, vi, data=dfm_moca_full)
+simple.moca <- rma(yi, vi, data=dfm_moca)
 
 
 # Using goups as a variable - ended up just breaking into subgroups
@@ -253,28 +253,28 @@ che.groups <-    rma.mv(yi, V= Vmaincons,
 groups.i2  <- var.comp(che.groups)
 
 # Arthritis - hiqual only
-simple.arth <- rma(yi,vi, data=dfm_arthritis)
-che.arth <- rmvee(dfm_arthritis,vmat=Varth)
+simple.arth <- rma(yi,vi, data=dfm_arthritis_high)
+che.arth <- rmvee(dfm_arthritis_high,vmat=Varth)
 
 # Arthritis - all studies
-simple.arth_full <- rma(yi,vi, data=dfm_arthritis_full)
-che.arth_full <- rmvee(dfm_arthritis_full,vmat=Varth_f)
+simple.arth_full <- rma(yi,vi, data=dfm_arthritis)
+che.arth_full <- rmvee(dfm_arthritis,vmat=Varth_f)
 
 # Fibromyalgia
-simple.fm <- rma(yi,vi, data=dfm_fm_full)
-che.fm <- rmvee(dfm_fm_full,vmat=Vfm)
+simple.fm <- rma(yi,vi, data=dfm_fm)
+che.fm <- rmvee(dfm_fm,vmat=Vfm)
 
 #MSK
-simple.msk <- rma(yi,vi, data=dfm_msk_full)
-che.msk <- rmvee(dfm_msk_full,vmat=Vmsk)
+simple.msk <- rma(yi,vi, data=dfm_msk)
+che.msk <- rmvee(dfm_msk,vmat=Vmsk)
 
 # Headache
-simple.head <- rma(yi,vi, data=dfm_head_full)
-che.head <- rmvee(dfm_head_full,vmat=Vhead)
+simple.head <- rma(yi,vi, data=dfm_head)
+che.head <- rmvee(dfm_head,vmat=Vhead)
 
 # Depression (no clusters)
-simple.dep <- rma(yi, vi, data=dfm_depfree)
-simple.dep_full <- rma(yi, vi, data=dfm_depfree_full)
+simple.dep <- rma(yi, vi, data=dfm_depfree_high)
+simple.dep_full <- rma(yi, vi, data=dfm_depfree)
 
 
 # age
@@ -397,5 +397,5 @@ total_table <- as_tibble(total_table)
 
 
 
-metacont(data=dfm_depfree,n_cont, cognitive_mean_cont, cognitive_sd_cont,n_treat, cognitive_mean_treat,cognitive_sd_treat, sm = "SMD")
+metacont(data=dfm_depfree_high,n_cont, cognitive_mean_cont, cognitive_sd_cont,n_treat, cognitive_mean_treat,cognitive_sd_treat, sm = "SMD")
 
